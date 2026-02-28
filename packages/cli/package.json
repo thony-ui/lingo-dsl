@@ -1,6 +1,6 @@
 {
   "name": "@lingo-dsl/cli",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "CLI tool for LingoUI - build and dev server",
   "main": "dist/index.js",
   "bin": {
