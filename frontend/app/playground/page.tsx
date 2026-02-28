@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
@@ -113,6 +114,7 @@ export async function fetchMultipleMeowFacts(signal, count) {
     const data = await response.json();
     
     if (data && data.data) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
       signal.set(data.data);
     }
   } catch (error) {
@@ -130,6 +132,22 @@ export default function Playground() {
   const [compiledCode, setCompiledCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [showDocs, setShowDocs] = useState(false);
+  const [liveState, setLiveState] = useState<Record<string, any>>({});
+
+  // Listen for state updates from the preview iframe
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'STATE_UPDATE') {
+        setLiveState(prev => ({
+          ...prev,
+          [event.data.name]: event.data.value
+        }));
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   const compileCode = useCallback((lingoCode: string, customFunctions: string) => {
     try {
@@ -174,6 +192,8 @@ ${replaceCodeWithImports}
   // Compile on mount and when code or functions change
   useEffect(() => {
     compileCode(code, functions);
+    // Reset live state when code changes
+    setLiveState({});
   }, [code, functions, compileCode]);
   const handleLoadExample = useCallback((exampleCode: string, exampleFunctions?: string) => {
     setCode(exampleCode);
@@ -184,7 +204,7 @@ ${replaceCodeWithImports}
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col bg-zinc-50 dark:bg-zinc-950">
       {/* Header Navigation */}
-      <nav className="border-b bg-white dark:bg-zinc-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
+      <nav className="border-b bg-white dark:bg-zinc-900 px-4 py-3 flex items-center justify-between shrink-0">
         <Link href="/" className="flex items-center gap-2">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-violet-600 dark:text-violet-400" />
@@ -233,14 +253,14 @@ ${replaceCodeWithImports}
           
           {/* Explain Mode Panel */}
           <Panel defaultSize={33} minSize={20}>
-            <ExplainMode compiledCode={compiledCode} />
+            <ExplainMode compiledCode={compiledCode} lingoCode={code} liveState={liveState} />
           </Panel>
         </Group>
       </div>
 
       {/* Documentation Sheet Overlay */}
       <Sheet open={showDocs} onOpenChange={setShowDocs}>
-        <SheetContent side="right" className="w-full sm:w-[540px] md:w-[640px] lg:w-[740px] p-0">
+        <SheetContent side="right" className="w-full sm:w-135 md:w-160 lg:w-185 p-0">
           <SheetHeader className="sr-only">
             <SheetTitle>Documentation & Examples</SheetTitle>
             <SheetDescription>

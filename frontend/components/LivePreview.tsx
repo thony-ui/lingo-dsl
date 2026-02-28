@@ -53,9 +53,19 @@ export default function LivePreview({ compiledCode, error }: LivePreviewProps) {
     let currentEffect = null;
     
     class Signal {
-      constructor(initialValue) {
+      constructor(initialValue, name) {
         this.value = initialValue;
+        this.name = name;
         this.subscribers = new Set();
+        
+        // Notify parent of initial state
+        if (this.name && window.parent) {
+          window.parent.postMessage({
+            type: 'STATE_UPDATE',
+            name: this.name,
+            value: this.value
+          }, '*');
+        }
       }
       
       get() {
@@ -69,12 +79,21 @@ export default function LivePreview({ compiledCode, error }: LivePreviewProps) {
         if (this.value !== newValue) {
           this.value = newValue;
           this.subscribers.forEach(effect => effect());
+          
+          // Notify parent of state change
+          if (this.name && window.parent) {
+            window.parent.postMessage({
+              type: 'STATE_UPDATE',
+              name: this.name,
+              value: this.value
+            }, '*');
+          }
         }
       }
     }
     
-    function createSignal(initialValue) {
-      return new Signal(initialValue);
+    function createSignal(initialValue, name) {
+      return new Signal(initialValue, name);
     }
     
     function createEffect(fn) {

@@ -122,7 +122,7 @@ export class JSCodeGenerator implements ICodeGenerator {
       initialValue = this.generateValue(stmt.initialValue);
     }
 
-    return `const ${stmt.identifier} = createSignal(${initialValue});`;
+    return `const ${stmt.identifier} = createSignal(${initialValue}, '${stmt.identifier}');`;
   }
 
   private generateShowStmt(stmt: ShowStmt, prefix: string = ""): string {
@@ -383,36 +383,44 @@ export class JSCodeGenerator implements ICodeGenerator {
 
   private generateEventBlock(stmt: EventBlock): string {
     const widget = stmt.widgetRef;
-    let selector = "";
+    const eventType = stmt.verb === "click" ? "click" : "input";
+    const handlerVar = `handler_${this.eventCounter++}`;
+
+    let code = "";
 
     if (widget.type === "literal") {
-      // Find button by text content
-      selector = `Array.from(root.querySelectorAll('${widget.widget}')).find(el => el.textContent === "${widget.label}")`;
+      // Use event delegation for literal widgets (e.g., buttons with text)
+      code += `root.addEventListener('${eventType}', (e) => {\n`;
+      this.indent++;
+      code += `${this.indentLine(`if (e.target.tagName === '${widget.widget.toUpperCase()}' && e.target.textContent === "${widget.label}") {`)}`;
+      this.indent++;
+
+      for (const action of stmt.actions) {
+        const actionCode = this.generateAction(action.action);
+        code += `\n${this.indentLine(actionCode)}`;
+      }
+
+      this.indent--;
+      code += `\n${this.indentLine("}")}`;
+      this.indent--;
+      code += `\n${this.indentLine("});")}`;
     } else {
-      // Find by data-identifier
-      selector = `root.querySelector('[data-identifier="${widget.identifier}"]')`;
+      // Use event delegation for identifier-based widgets
+      code += `root.addEventListener('${eventType}', (e) => {\n`;
+      this.indent++;
+      code += `${this.indentLine(`if (e.target.dataset.identifier === "${widget.identifier}") {`)}`;
+      this.indent++;
+
+      for (const action of stmt.actions) {
+        const actionCode = this.generateAction(action.action);
+        code += `\n${this.indentLine(actionCode)}`;
+      }
+
+      this.indent--;
+      code += `\n${this.indentLine("}")}`;
+      this.indent--;
+      code += `\n${this.indentLine("});")}`;
     }
-
-    const eventType = stmt.verb === "click" ? "click" : "input";
-    const targetVar = `target_${this.eventCounter++}`;
-
-    let code = `const ${targetVar} = ${selector};\n`;
-    code += `${this.indentLine(`if (${targetVar}) {`)}`;
-
-    this.indent++;
-    code += `\n${this.indentLine(`${targetVar}.addEventListener('${eventType}', () => {`)}`;
-
-    this.indent++;
-    for (const action of stmt.actions) {
-      const actionCode = this.generateAction(action.action);
-      code += `\n${this.indentLine(actionCode)}`;
-    }
-
-    this.indent--;
-    code += `\n${this.indentLine("});")}`;
-
-    this.indent--;
-    code += `\n${this.indentLine("}")}`;
 
     return code;
   }
@@ -578,7 +586,8 @@ export class JSCodeGenerator implements ICodeGenerator {
         stmt.config.template,
         itemName,
       );
-      code += ` ${widgetId}.textContent = ${template};`;
+      // Make text content reactive with createEffect
+      code += ` createEffect(() => { ${widgetId}.textContent = ${template}; });`;
     } else if (stmt.config.type === "called") {
       // Handle input binding
       const identifier = stmt.config.identifier;

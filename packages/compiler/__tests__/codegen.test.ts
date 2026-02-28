@@ -52,28 +52,28 @@ describe("JSCodeGenerator", () => {
       const source = "There is a number called count starting at 0.";
       const code = generate(source);
 
-      expect(code).toContain("const count = createSignal(0)");
+      expect(code).toContain("const count = createSignal(0, 'count')");
     });
 
     it("should generate signal for text", () => {
       const source = 'There is text called name starting at "John".';
       const code = generate(source);
 
-      expect(code).toContain('const name = createSignal("John")');
+      expect(code).toContain("const name = createSignal(\"John\", 'name')");
     });
 
     it("should generate signal for boolean", () => {
       const source = "There is a boolean called isOpen starting at true.";
       const code = generate(source);
 
-      expect(code).toContain("const isOpen = createSignal(true)");
+      expect(code).toContain("const isOpen = createSignal(true, 'isOpen')");
     });
 
     it("should generate signal for list with empty array", () => {
       const source = "There is a list called todos starting empty.";
       const code = generate(source);
 
-      expect(code).toContain("const todos = createSignal([])");
+      expect(code).toContain("const todos = createSignal([], 'todos')");
     });
 
     it("should generate multiple signals", () => {
@@ -81,8 +81,8 @@ describe("JSCodeGenerator", () => {
 There is a number called y starting at 2.`;
       const code = generate(source);
 
-      expect(code).toContain("const x = createSignal(1)");
-      expect(code).toContain("const y = createSignal(2)");
+      expect(code).toContain("const x = createSignal(1, 'x')");
+      expect(code).toContain("const y = createSignal(2, 'y')");
     });
   });
 
@@ -177,9 +177,10 @@ Show text saying "Count: {count}".`;
 increase count by 1.`;
       const code = generate(source);
 
-      expect(code).toContain("Array.from(root.querySelectorAll('button'))");
-      expect(code).toContain('.find(el => el.textContent === "Add")');
-      expect(code).toContain("addEventListener('click'");
+      expect(code).toContain("root.addEventListener('click'");
+      expect(code).toContain("e.target.tagName === 'BUTTON'");
+      expect(code).toContain('e.target.textContent === "Add"');
+      expect(code).toContain("count.set(count.get() + 1)");
     });
 
     it("should generate click event handler with identifier selector", () => {
@@ -187,9 +188,9 @@ increase count by 1.`;
 increase count by 1.`;
       const code = generate(source);
 
-      expect(code).toContain(
-        "root.querySelector('[data-identifier=\"submitBtn\"]')",
-      );
+      expect(code).toContain("root.addEventListener('click'");
+      expect(code).toContain('e.target.dataset.identifier === "submitBtn"');
+      expect(code).toContain("count.set(count.get() + 1)");
     });
 
     it("should generate input event handler", () => {
@@ -318,7 +319,7 @@ increase count by 1.`;
 
       const code = generate(source);
 
-      expect(code).toContain("const count = createSignal(0)");
+      expect(code).toContain("const count = createSignal(0, 'count')");
       expect(code).toContain("createElement('h1')");
       expect(code).toContain("createElement('button')");
       expect(code).toContain("addEventListener('click'");
