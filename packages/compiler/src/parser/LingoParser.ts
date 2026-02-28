@@ -437,6 +437,9 @@ export class LingoParser implements IParser {
       const action = this.parseActionStmt();
       if (action) {
         actions.push(action);
+      } else {
+        // Prevent infinite loop: if we couldn't parse an action, skip this token
+        this.advance();
       }
     }
 
@@ -766,7 +769,7 @@ export class LingoParser implements IParser {
     const token = this.peek();
     return (
       this.check(TokenType.THERE) ||
-      (this.check(TokenType.SHOW) && token.value === "Show") || // Only capitalized Show
+      (this.check(TokenType.SHOW) && token.value === "Show") || // Only capitalized Show for top-level
       this.check(TokenType.WHEN) ||
       this.check(TokenType.IF) ||
       this.check(TokenType.FOR)
