@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useIframePreview } from "@/hooks/useIframePreview";
+import { CompilationError } from "@/components/preview/CompilationError";
 
 interface LivePreviewProps {
   compiledCode: string;
@@ -8,161 +9,60 @@ interface LivePreviewProps {
 }
 
 export default function LivePreview({ compiledCode, error }: LivePreviewProps) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  useEffect(() => {
-    if (!iframeRef.current) return;
-    
-    if (!compiledCode) {
-      return;
-    }
-    
-
-    const sandboxHTML = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <style>
-    body {
-      margin: 0;
-      padding: 16px;
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-    * {
-      box-sizing: border-box;
-    }
-    button {
-      margin: 4px;
-      padding: 8px 16px;
-      cursor: pointer;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-  </style>
-</head>
-<body>
-  <div id="app"></div>
-  <script>
-    // Inline minimal runtime (no ES modules)
-    let currentEffect = null;
-    
-    class Signal {
-      constructor(initialValue, name) {
-        this.value = initialValue;
-        this.name = name;
-        this.subscribers = new Set();
-        
-        // Notify parent of initial state
-        if (this.name && window.parent) {
-          window.parent.postMessage({
-            type: 'STATE_UPDATE',
-            name: this.name,
-            value: this.value
-          }, '*');
-        }
-      }
-      
-      get() {
-        if (currentEffect) {
-          this.subscribers.add(currentEffect);
-        }
-        return this.value;
-      }
-      
-      set(newValue) {
-        if (this.value !== newValue) {
-          this.value = newValue;
-          this.subscribers.forEach(effect => effect());
-          
-          // Notify parent of state change
-          if (this.name && window.parent) {
-            window.parent.postMessage({
-              type: 'STATE_UPDATE',
-              name: this.name,
-              value: this.value
-            }, '*');
-          }
-        }
-      }
-    }
-    
-    function createSignal(initialValue, name) {
-      return new Signal(initialValue, name);
-    }
-    
-    function createEffect(fn) {
-      currentEffect = fn;
-      fn();
-      currentEffect = null;
-    }
-    
-    function renderApp(renderFn) {
-      const root = document.getElementById('app');
-      root.innerHTML = '';
-      renderFn(root);
-      return root;
-    }
-    
-    // Convert exported functions to customFunctions object
-    const customFunctions = {};
-    
-    // Now execute the compiled code
-    try {
-      ${compiledCode
-        .replace(/import\s+{[^}]+}\s+from\s+['"][^'"]+['"];?\s*/g, '')
-        .replace(/export\s+(async\s+)?function\s+(\w+)/g, (match, asyncKeyword, funcName) => {
-          // Keep createApp as a regular function, convert others to customFunctions
-          const isAsync = asyncKeyword ? 'async ' : '';
-          return funcName === 'createApp' ? `${isAsync}function createApp` : `customFunctions.${funcName} = ${isAsync}function`;
-        })}
-      
-      createApp();
-    } catch (error) {
-      console.error('Runtime error:', error);
-      document.getElementById('app').innerHTML = '<div style="color: red; padding: 20px; border: 1px solid red; border-radius: 4px;"><strong>Error:</strong><br>' + error.message + '<br><pre style="font-size: 10px;">' + error.stack + '</pre></div>';
-    }
-  </script>
-</body>
-</html>
-    `;
-
-    iframeRef.current.srcdoc = sandboxHTML;
-  }, [compiledCode]);
+  const iframeRef = useIframePreview(compiledCode);
 
   return (
     <div className="h-full w-full flex flex-col border-r border-zinc-200 dark:border-zinc-800">
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-zinc-900 dark:to-zinc-900 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-          Live Preview
-        </h2>
-      </div>
-      {error ? (
-        <div className="p-6 bg-zinc-50 dark:bg-zinc-900 h-full overflow-y-auto">
-          <div className="bg-red-50 dark:bg-red-950/20 border-2 border-red-200 dark:border-red-900 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-red-700 dark:text-red-400 mb-3 flex items-center gap-2">
-              <span className="text-lg">⚠️</span>
-              Compilation Error
-            </h3>
-            <pre className="text-xs text-red-600 dark:text-red-300 whitespace-pre-wrap font-mono bg-white dark:bg-zinc-950 p-3 rounded border border-red-200 dark:border-red-900">
-              {error}
-            </pre>
-          </div>
-        </div>
-      ) : (
-        <iframe
-          ref={iframeRef}
-          className="w-full h-full bg-white dark:bg-zinc-950"
-          sandbox="allow-scripts allow-same-origin"
-          title="Live Preview"
-        />
-      )}
+      <PreviewHeader />
+      <PreviewContent
+        iframeRef={iframeRef}
+        error={error}
+      />
     </div>
+  );
+}
+
+function PreviewHeader() {
+  return (
+    <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-zinc-900 dark:to-zinc-900 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2">
+      <LiveIndicator />
+      <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        Live Preview
+      </h2>
+    </div>
+  );
+}
+
+function LiveIndicator() {
+  return <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>;
+}
+
+interface PreviewContentProps {
+  iframeRef: React.RefObject<HTMLIFrameElement | null>;
+  error: string | null;
+}
+
+function PreviewContent({ iframeRef, error }: PreviewContentProps) {
+  if (error) {
+    return <CompilationError error={error} />;
+  }
+
+  return (
+    <PreviewIframe iframeRef={iframeRef} />
+  );
+}
+
+interface PreviewIframeProps {
+  iframeRef: React.RefObject<HTMLIFrameElement | null>;
+}
+
+function PreviewIframe({ iframeRef }: PreviewIframeProps) {
+  return (
+    <iframe
+      ref={iframeRef}
+      className="w-full h-full bg-white dark:bg-zinc-950"
+      sandbox="allow-scripts allow-same-origin"
+      title="Live Preview"
+    />
   );
 }
