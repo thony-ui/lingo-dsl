@@ -97,9 +97,10 @@ export default function LivePreview({ compiledCode, error }: LivePreviewProps) {
     try {
       ${compiledCode
         .replace(/import\s+{[^}]+}\s+from\s+['"][^'"]+['"];?\s*/g, '')
-        .replace(/export\s+function\s+(\w+)/g, (match, funcName) => {
+        .replace(/export\s+(async\s+)?function\s+(\w+)/g, (match, asyncKeyword, funcName) => {
           // Keep createApp as a regular function, convert others to customFunctions
-          return funcName === 'createApp' ? 'function createApp' : `customFunctions.${funcName} = function`;
+          const isAsync = asyncKeyword ? 'async ' : '';
+          return funcName === 'createApp' ? `${isAsync}function createApp` : `customFunctions.${funcName} = ${isAsync}function`;
         })}
       
       createApp();

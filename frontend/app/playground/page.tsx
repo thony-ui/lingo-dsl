@@ -93,6 +93,34 @@ export function double(signal) {
 export function reset(signal) {
   signal.set(0);
 }
+export async function fetchMeowFacts(signal) {
+  try {
+    const response = await fetch('https://meowfacts.herokuapp.com/');
+    const data = await response.json();
+    
+    // The API returns { data: ["fact1", "fact2", ...] }
+    if (data && data.data) {
+      signal.set(data.data);
+    }
+  } catch (error) {
+    console.error('Failed to fetch cat facts:', error);
+    signal.set(['Failed to fetch cat facts. Please try again.']);
+  }
+}
+export async function fetchMultipleMeowFacts(signal, count) {
+  try {
+    const response = await fetch(\`https://meowfacts.herokuapp.com/?count=\${count}\`);
+    const data = await response.json();
+    
+    if (data && data.data) {
+      signal.set(data.data);
+    }
+  } catch (error) {
+    console.error('Failed to fetch cat facts:', error);
+    signal.set(['Failed to fetch cat facts. Please try again.']);
+  }
+}
+
 `;
 
 

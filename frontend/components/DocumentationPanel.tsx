@@ -271,6 +271,34 @@ Show a listitem saying "Second item".
 Show an italic saying "Welcome, {userName}!".
 Show a paragraph saying "User {userName} is currently logged in.".`,
   },
+  {
+    title: "API Handling",
+    description: "Make API calls and display dynamic data",
+    tags: ["API", "Dynamic Data", "Advanced"],
+    code: `# Cat Facts API Example
+# Demonstrates: API calls with custom functions and displaying fetched data
+
+There is a list called facts starting empty.
+There is a number called factCount starting at 3.
+
+Show a heading saying "🐱 Cat Facts from MeowFacts API".
+
+Show a text saying "Number of facts to fetch: {factCount}".
+Show a button saying "Fetch Cat Facts".
+Show a button saying "Fetch More (5 facts)".
+
+# Fetch facts when button clicked
+When I click the button "Fetch Cat Facts",
+fetchMeowFacts facts.
+
+When I click the button "Fetch More (5 facts)",
+fetchMultipleMeowFacts facts with count "5".
+
+# Display all fetched facts
+For each fact in facts,
+show a text saying "🐱 {fact}".
+`
+  }
 ];
 
 interface DocumentationPanelProps {
