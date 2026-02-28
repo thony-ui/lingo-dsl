@@ -94,6 +94,7 @@ show a text saying "Third".
 ```
 
 **Available Style Properties:**
+
 - `colored [color]` - Set text color
 - `background [color]` - Set background color
 - `centered` - Center align text
@@ -101,6 +102,7 @@ show a text saying "Third".
 - `gap "[size]"` - Set spacing in layouts (for row/column)
 
 **Layout Containers:**
+
 - `row containing,` - Horizontal flex layout
 - `column containing,` - Vertical flex layout
 
