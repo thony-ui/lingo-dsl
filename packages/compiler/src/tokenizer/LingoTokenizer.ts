@@ -47,6 +47,16 @@ export class LingoTokenizer implements ITokenizer {
     ["or", TokenType.OR],
     ["equal", TokenType.EQUAL],
     ["not", TokenType.NOT],
+    // Styling keywords
+    ["colored", TokenType.COLORED],
+    ["centered", TokenType.CENTERED],
+    ["aligned", TokenType.ALIGNED],
+    ["containing", TokenType.CONTAINING],
+    ["left", TokenType.LEFT],
+    ["right", TokenType.RIGHT],
+    ["center", TokenType.CENTER],
+    ["background", TokenType.BACKGROUND],
+    ["gap", TokenType.GAP],
     // Types
     ["number", TokenType.NUMBER_TYPE],
     ["boolean", TokenType.BOOLEAN_TYPE],

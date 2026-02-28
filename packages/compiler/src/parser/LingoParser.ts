@@ -16,6 +16,7 @@ import {
   Value,
   WidgetType,
   ShowConfig,
+  StyleProperties,
   EventVerb,
   WidgetRef,
   Action,
@@ -222,13 +223,27 @@ export class LingoParser implements IParser {
     const widget = isCustom ? this.parseCustomWidget() : this.parseWidget();
     const config = isCustom ? this.parseCustomConfig() : this.parseShowConfig();
 
-    this.consume(TokenType.PERIOD, "Expected '.'");
+    // Parse styling properties
+    const styles = this.parseStyles();
+
+    // Parse children for containers (row/column)
+    let children: ShowStmt[] | undefined;
+    if (this.check(TokenType.CONTAINING)) {
+      children = this.parseContainerChildren();
+    }
+
+    // Period is not required if we have children (they end when next statement starts)
+    if (!children) {
+      this.consume(TokenType.PERIOD, "Expected '.'");
+    }
     this.skipNewlines();
 
     return {
       type: ASTNodeType.SHOW_STMT,
       widget,
       config,
+      styles,
+      children,
       isCustom,
       location,
     };
@@ -411,6 +426,110 @@ export class LingoParser implements IParser {
     }
 
     return { type: "empty" };
+  }
+
+  private parseStyles(): StyleProperties | undefined {
+    const styles: StyleProperties = {};
+    let hasStyles = false;
+
+    // Parse styling keywords: colored, centered, aligned, background, gap
+    while (
+      this.check(TokenType.COLORED) ||
+      this.check(TokenType.CENTERED) ||
+      this.check(TokenType.ALIGNED) ||
+      this.check(TokenType.BACKGROUND) ||
+      this.check(TokenType.GAP) ||
+      this.check(TokenType.AND)
+    ) {
+      // Skip "and" connectors
+      if (this.check(TokenType.AND)) {
+        this.advance();
+        continue;
+      }
+
+      if (this.check(TokenType.COLORED)) {
+        this.advance();
+        // Next token should be an identifier (color name) or string
+        const colorToken = this.peek();
+        if (
+          colorToken.type === TokenType.IDENTIFIER ||
+          colorToken.type === TokenType.STRING
+        ) {
+          styles.color = this.advance().value;
+          hasStyles = true;
+        }
+      } else if (this.check(TokenType.CENTERED)) {
+        this.advance();
+        styles.textAlign = "center";
+        hasStyles = true;
+      } else if (this.check(TokenType.ALIGNED)) {
+        this.advance();
+        // Next should be left, right, or center
+        if (this.check(TokenType.LEFT)) {
+          this.advance();
+          styles.textAlign = "left";
+          hasStyles = true;
+        } else if (this.check(TokenType.RIGHT)) {
+          this.advance();
+          styles.textAlign = "right";
+          hasStyles = true;
+        } else if (this.check(TokenType.CENTER)) {
+          this.advance();
+          styles.textAlign = "center";
+          hasStyles = true;
+        }
+      } else if (this.check(TokenType.BACKGROUND)) {
+        this.advance();
+        // Next token should be an identifier (color name) or string
+        const bgToken = this.peek();
+        if (
+          bgToken.type === TokenType.IDENTIFIER ||
+          bgToken.type === TokenType.STRING
+        ) {
+          styles.backgroundColor = this.advance().value;
+          hasStyles = true;
+        }
+      } else if (this.check(TokenType.GAP)) {
+        this.advance();
+        // Next token should be a string or number
+        const gapToken = this.peek();
+        if (
+          gapToken.type === TokenType.STRING ||
+          gapToken.type === TokenType.NUMBER ||
+          gapToken.type === TokenType.IDENTIFIER
+        ) {
+          styles.gap = this.advance().value;
+          hasStyles = true;
+        }
+      }
+    }
+
+    return hasStyles ? styles : undefined;
+  }
+
+  private parseContainerChildren(): ShowStmt[] {
+    this.consume(TokenType.CONTAINING, "Expected 'containing'");
+    this.consume(TokenType.COMMA, "Expected ','");
+    this.skipNewlines();
+
+    const children: ShowStmt[] = [];
+
+    // Parse child show statements until we hit a new statement
+    while (!this.isAtEnd() && !this.isStatementStart()) {
+      if (this.check(TokenType.NEWLINE)) {
+        this.advance();
+        continue;
+      }
+
+      if (this.check(TokenType.SHOW)) {
+        const child = this.parseShowStmt(true);
+        children.push(child);
+      } else {
+        break;
+      }
+    }
+
+    return children;
   }
 
   private parseEventBlock(): EventBlock {

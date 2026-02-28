@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@lingo-dsl/compiler": "^0.1.4",
+    "@lingo-dsl/compiler": "^0.1.5",
     "@lingo-dsl/runtime": "^0.1.0",
     "@monaco-editor/react": "^4.7.0",
     "class-variance-authority": "^0.7.1",

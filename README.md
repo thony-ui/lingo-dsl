@@ -69,9 +69,40 @@ Show text saying "Hello {name}!".
 Show a button saying "Click me".
 Show an input called username.
 Show an image with source "logo.png".
-Show a row.
-Show a column.
 ```
+
+### Styling & Layout
+
+```lingo
+# Text colors and alignment
+Show a heading saying "Title" colored blue and centered.
+Show a text saying "Green text" colored green and aligned left.
+
+# Background colors
+Show a text saying "Highlighted" background yellow.
+
+# Layout containers
+Show a row containing,
+show a text saying "Item 1".
+show a text saying "Item 2".
+show a text saying "Item 3".
+
+Show a column gap "10px" containing,
+show a text saying "First".
+show a text saying "Second".
+show a text saying "Third".
+```
+
+**Available Style Properties:**
+- `colored [color]` - Set text color
+- `background [color]` - Set background color
+- `centered` - Center align text
+- `aligned left/right/center` - Align text
+- `gap "[size]"` - Set spacing in layouts (for row/column)
+
+**Layout Containers:**
+- `row containing,` - Horizontal flex layout
+- `column containing,` - Vertical flex layout
 
 ### Events & Actions
 
@@ -130,6 +161,8 @@ See the `examples/` directory:
 - `counter.lingo` - Simple counter with increment/decrement
 - `todos.lingo` - Todo list with add/remove
 - `profile.lingo` - Conditional rendering and multiple state types
+- `styling-demo.lingo` - Styling and layout demonstration
+- `custom-widgets.lingo` - Custom widgets with JavaScript functions
 
 ## Testing
 

@@ -272,6 +272,37 @@ Show an italic saying "Welcome, {userName}!".
 Show a paragraph saying "User {userName} is currently logged in.".`,
   },
   {
+    title: "Styling & Layout",
+    description: "Use colors, alignment, and layout containers to style your UI",
+    tags: ["Styling", "Layout", "Design"],
+    code: `# Styling Demo
+# Demonstrates: colored text, centered alignment, row and column layouts
+
+There is a number called count starting at 0.
+
+Show a heading saying "Styling Demo" centered and colored blue.
+
+Show a text saying "This text is green and centered" colored green and centered.
+
+Show a text saying "This text is red and aligned right" colored red and aligned right.
+
+Show a row containing,
+show a text saying "Item 1" colored purple.
+show a text saying "Item 2" colored orange.
+show a text saying "Item 3" colored teal.
+
+Show a column gap "10px" containing,
+show a text saying "First in column" background lightblue.
+show a text saying "Second in column" background lightgreen.
+show a text saying "Third in column" background lightyellow.
+
+Show a button saying "Increment".
+Show a text saying "Count: {count}".
+
+When I click the button "Increment",
+increase count by 1.`,
+  },
+  {
     title: "API Handling",
     description: "Make API calls and display dynamic data",
     tags: ["API", "Dynamic Data", "Advanced"],
@@ -481,10 +512,97 @@ export default function DocumentationPanel({ onLoadExample }: DocumentationPanel
             </div>
           </Card>
 
+          {/* Styling */}
+          <Card className="p-5 bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20">
+            <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
+              🎨 Styling & Layout
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div>
+                <h4 className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2">Style Properties</h4>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-3">
+                  Add style keywords after widget declarations to customize appearance.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-3">
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    🎨 Text Color
+                  </div>
+                  <code className="text-xs text-zinc-600 dark:text-zinc-400 block mb-2">
+                    colored [color]
+                  </code>
+                  <code className="text-[11px] text-zinc-500 dark:text-zinc-500 block bg-zinc-50 dark:bg-zinc-950 p-2 rounded">
+                    Show a text saying &quot;Green text&quot; colored green.<br/>
+                    Show a heading saying &quot;Title&quot; colored blue.
+                  </code>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    🖼️ Background Color
+                  </div>
+                  <code className="text-xs text-zinc-600 dark:text-zinc-400 block mb-2">
+                    background [color]
+                  </code>
+                  <code className="text-[11px] text-zinc-500 dark:text-zinc-500 block bg-zinc-50 dark:bg-zinc-950 p-2 rounded">
+                    Show a text saying &quot;Highlighted&quot; background yellow.<br/>
+                    Show a text saying &quot;Info&quot; background lightblue.
+                  </code>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    📐 Text Alignment
+                  </div>
+                  <code className="text-xs text-zinc-600 dark:text-zinc-400 block mb-2">
+                    centered | aligned left | aligned right | aligned center
+                  </code>
+                  <code className="text-[11px] text-zinc-500 dark:text-zinc-500 block bg-zinc-50 dark:bg-zinc-950 p-2 rounded">
+                    Show a heading saying &quot;Title&quot; centered.<br/>
+                    Show a text saying &quot;Right aligned&quot; aligned right.
+                  </code>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    📦 Layout Containers
+                  </div>
+                  <code className="text-xs text-zinc-600 dark:text-zinc-400 block mb-2">
+                    row containing, | column gap &quot;[size]&quot; containing,
+                  </code>
+                  <code className="text-[11px] text-zinc-500 dark:text-zinc-500 block bg-zinc-50 dark:bg-zinc-950 p-2 rounded">
+                    Show a row containing,<br/>
+                    show a text saying &quot;Item 1&quot;.<br/>
+                    show a text saying &quot;Item 2&quot;.<br/>
+                    <br/>
+                    Show a column gap &quot;10px&quot; containing,<br/>
+                    show a text saying &quot;First&quot;.<br/>
+                    show a text saying &quot;Second&quot;.
+                  </code>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    🌈 Combining Styles
+                  </div>
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-2">
+                    Use <code className="bg-violet-50 dark:bg-violet-950/30 px-1 rounded">and</code> to combine multiple styles:
+                  </p>
+                  <code className="text-[11px] text-zinc-500 dark:text-zinc-500 block bg-zinc-50 dark:bg-zinc-950 p-2 rounded">
+                    Show a heading saying &quot;Welcome&quot; colored blue and centered.<br/>
+                    Show a text saying &quot;Info&quot; colored white and background darkblue.
+                  </code>
+                </div>
+              </div>
+            </div>
+          </Card>
+
           {/* Widgets */}
           <Card className="p-5 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
             <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
-              🎨 Widget Reference
+              🧩 Widget Reference
             </h3>
             <div className="space-y-3 text-sm">
               <div>
@@ -560,6 +678,20 @@ export default function DocumentationPanel({ onLoadExample }: DocumentationPanel
                     Layout & Structure
                   </summary>
                   <div className="mt-2 space-y-2 text-xs">
+                    <div>
+                      <code className="text-violet-600 dark:text-violet-400">row</code>
+                      <span className="text-zinc-600 dark:text-zinc-400"> - Horizontal flex container</span>
+                      <code className="block mt-1 text-[11px] text-zinc-500 dark:text-zinc-500">
+                        Show a row containing,
+                      </code>
+                    </div>
+                    <div>
+                      <code className="text-violet-600 dark:text-violet-400">column</code>
+                      <span className="text-zinc-600 dark:text-zinc-400"> - Vertical flex container</span>
+                      <code className="block mt-1 text-[11px] text-zinc-500 dark:text-zinc-500">
+                        Show a column gap &quot;10px&quot; containing,
+                      </code>
+                    </div>
                     <div>
                       <code className="text-violet-600 dark:text-violet-400">container</code>
                       <span className="text-zinc-600 dark:text-zinc-400"> - Generic container (div)</span>

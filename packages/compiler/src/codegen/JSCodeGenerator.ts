@@ -193,28 +193,40 @@ export class JSCodeGenerator implements ICodeGenerator {
 
   private generateHeading(stmt: ShowStmt, id: string, prefix: string): string {
     const config = stmt.config;
+    let code = `${prefix}const ${id} = document.createElement('h1');\n`;
+    
     if (config.type === "saying") {
       const template = this.generateTemplate(config.template);
-      return (
-        `${prefix}const ${id} = document.createElement('h1');\n` +
-        `${prefix}createEffect(() => { ${id}.textContent = ${template}; });\n` +
-        `${prefix}root.appendChild(${id});`
-      );
+      code += `${prefix}createEffect(() => { ${id}.textContent = ${template}; });\n`;
     }
-    return `${prefix}const ${id} = document.createElement('h1');\n${prefix}root.appendChild(${id});`;
+    
+    // Apply styles
+    if (stmt.styles) {
+      const styleCode = this.generateStyles(stmt.styles, id);
+      code += styleCode.replace(/\n  /g, `\n${prefix}`);
+    }
+    
+    code += `${prefix}root.appendChild(${id});`;
+    return code;
   }
 
   private generateText(stmt: ShowStmt, id: string, prefix: string): string {
     const config = stmt.config;
+    let code = `${prefix}const ${id} = document.createElement('p');\n`;
+    
     if (config.type === "saying") {
       const template = this.generateTemplate(config.template);
-      return (
-        `${prefix}const ${id} = document.createElement('p');\n` +
-        `${prefix}createEffect(() => { ${id}.textContent = ${template}; });\n` +
-        `${prefix}root.appendChild(${id});`
-      );
+      code += `${prefix}createEffect(() => { ${id}.textContent = ${template}; });\n`;
     }
-    return `${prefix}const ${id} = document.createElement('p');\n${prefix}root.appendChild(${id});`;
+    
+    // Apply styles
+    if (stmt.styles) {
+      const styleCode = this.generateStyles(stmt.styles, id);
+      code += styleCode.replace(/\n  /g, `\n${prefix}`);
+    }
+    
+    code += `${prefix}root.appendChild(${id});`;
+    return code;
   }
 
   private generateButton(stmt: ShowStmt, id: string, prefix: string): string {
@@ -237,6 +249,12 @@ export class JSCodeGenerator implements ICodeGenerator {
 
     if (identifier) {
       code += `${prefix}${id}.dataset.identifier = '${identifier}';\n`;
+    }
+    
+    // Apply styles
+    if (stmt.styles) {
+      const styleCode = this.generateStyles(stmt.styles, id);
+      code += styleCode.replace(/\n  /g, `\n${prefix}`);
     }
 
     code += `${prefix}root.appendChild(${id});`;
@@ -279,8 +297,33 @@ export class JSCodeGenerator implements ICodeGenerator {
   ): string {
     let code = `${prefix}const ${id} = document.createElement('div');\n`;
     code += `${prefix}${id}.className = '${type}';\n`;
-    code += `${prefix}root.appendChild(${id});`;
-    return code;
+    
+    // Apply flex layout
+    code += `${prefix}${id}.style.display = 'flex';\n`;
+    code += `${prefix}${id}.style.flexDirection = '${type === "row" ? "row" : "column"}';\n`;
+    
+    // Apply styles
+    if (stmt.styles) {
+      const styleCode = this.generateStyles(stmt.styles, id);
+      code += styleCode.replace(/\n  /g, `\n${prefix}`);
+    }
+    
+    code += `${prefix}root.appendChild(${id});\n`;
+    
+    // Render children if present
+    if (stmt.children && stmt.children.length > 0) {
+      for (const child of stmt.children) {
+        const childCode = this.generateShowStmt(child, prefix);
+        // Replace 'root' with container id in child code
+        const childCodeWithParent = childCode.replace(
+          /root\.appendChild\(/g,
+          `${id}.appendChild(`,
+        );
+        code += childCodeWithParent + "\n";
+      }
+    }
+    
+    return code.trimEnd();
   }
 
   private generateGenericElement(
@@ -300,17 +343,20 @@ export class JSCodeGenerator implements ICodeGenerator {
 
     if (config.type === "saying") {
       const template = this.generateTemplate(config.template);
-      code +=
-        `${prefix}createEffect(() => { ${id}.textContent = ${template}; });\n` +
-        `${prefix}root.appendChild(${id});`;
+      code += `${prefix}createEffect(() => { ${id}.textContent = ${template}; });\n`;
     } else if (config.type === "called") {
       const identifier = config.identifier;
       code += `${prefix}${id}.setAttribute('data-identifier', '${identifier}');\n`;
       code += `${prefix}createEffect(() => { ${id}.textContent = ${identifier}.get(); });\n`;
-      code += `${prefix}root.appendChild(${id});`;
-    } else {
-      code += `${prefix}root.appendChild(${id});`;
     }
+    
+    // Apply styles
+    if (stmt.styles) {
+      const styleCode = this.generateStyles(stmt.styles, id);
+      code += styleCode.replace(/\n  /g, `\n${prefix}`);
+    }
+    
+    code += `${prefix}root.appendChild(${id});`;
 
     return code;
   }
@@ -576,5 +622,43 @@ export class JSCodeGenerator implements ICodeGenerator {
 
   private indentLine(line: string): string {
     return "  ".repeat(this.indent) + line;
+  }
+
+  private generateStyles(
+    styles: import("../parser/AST").StyleProperties | undefined,
+    widget: string,
+  ): string {
+    if (!styles) return "";
+
+    const styleLines: string[] = [];
+
+    if (styles.color) {
+      styleLines.push(`  ${widget}.style.color = '${styles.color}';`);
+    }
+
+    if (styles.backgroundColor) {
+      styleLines.push(
+        `  ${widget}.style.backgroundColor = '${styles.backgroundColor}';`,
+      );
+    }
+
+    if (styles.textAlign) {
+      styleLines.push(`  ${widget}.style.textAlign = '${styles.textAlign}';`);
+    }
+
+    if (styles.gap) {
+      styleLines.push(`  ${widget}.style.gap = '${styles.gap}';`);
+    }
+
+    // Add flex layout styles for row/column
+    if (widget.includes("row") || widget.includes("column")) {
+      styleLines.push(`  ${widget}.style.display = 'flex';`);
+      const flexDirection = widget.includes("row") ? "row" : "column";
+      styleLines.push(
+        `  ${widget}.style.flexDirection = '${flexDirection}';`,
+      );
+    }
+
+    return styleLines.length > 0 ? "\n" + styleLines.join("\n") : "";
   }
 }

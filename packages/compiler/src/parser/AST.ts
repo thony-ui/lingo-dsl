@@ -112,14 +112,22 @@ export type WidgetType =
   | "tbody"
   | "tfoot"
   // Other
-  | "br"
   | "hr"
   | string; // Allow custom widget names
+
+export interface StyleProperties {
+  color?: string;
+  backgroundColor?: string;
+  textAlign?: "left" | "center" | "right";
+  gap?: string;
+}
 
 export interface ShowStmt extends ASTNode {
   type: ASTNodeType.SHOW_STMT;
   widget: WidgetType;
   config: ShowConfig;
+  styles?: StyleProperties; // Style properties
+  children?: ShowStmt[]; // For layout containers
   isCustom?: boolean; // Flag to indicate custom widget
 }
 

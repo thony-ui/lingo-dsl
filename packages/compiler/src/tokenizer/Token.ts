@@ -43,6 +43,17 @@ export enum TokenType {
   EQUAL = "EQUAL",
   NOT = "NOT",
 
+  // Styling keywords
+  COLORED = "COLORED",
+  CENTERED = "CENTERED",
+  ALIGNED = "ALIGNED",
+  CONTAINING = "CONTAINING",
+  LEFT = "LEFT",
+  RIGHT = "RIGHT",
+  CENTER = "CENTER",
+  BACKGROUND = "BACKGROUND",
+  GAP = "GAP",
+
   // Types
   NUMBER_TYPE = "NUMBER_TYPE",
   TEXT_TYPE = "TEXT_TYPE",
