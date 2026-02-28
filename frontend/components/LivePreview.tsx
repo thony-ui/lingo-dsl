@@ -90,11 +90,17 @@ export default function LivePreview({ compiledCode, error }: LivePreviewProps) {
       return root;
     }
     
+    // Convert exported functions to customFunctions object
+    const customFunctions = {};
+    
     // Now execute the compiled code
     try {
       ${compiledCode
         .replace(/import\s+{[^}]+}\s+from\s+['"][^'"]+['"];?\s*/g, '')
-        .replace("export function createApp() {", 'function createApp() {')}
+        .replace(/export\s+function\s+(\w+)/g, (match, funcName) => {
+          // Keep createApp as a regular function, convert others to customFunctions
+          return funcName === 'createApp' ? 'function createApp' : `customFunctions.${funcName} = function`;
+        })}
       
       createApp();
     } catch (error) {

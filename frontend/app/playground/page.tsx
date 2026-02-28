@@ -5,8 +5,16 @@ import Link from "next/link";
 import LingoEditor from "@/components/LingoEditor";
 import LivePreview from "@/components/LivePreview";
 import ExplainMode from "@/components/ExplainMode";
+import DocumentationPanel from "@/components/DocumentationPanel";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Home } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Sparkles, Home, BookOpen } from "lucide-react";
 import { 
   Compiler,
   LingoTokenizer,
@@ -15,6 +23,7 @@ import {
   JSCodeGenerator,
   ConsoleErrorReporter
 } from "@lingo-dsl/compiler";
+import { Panel, Group, Separator } from "react-resizable-panels";
 
 const DEFAULT_CODE = 
 `# Simple Counter Example
@@ -40,13 +49,61 @@ When I click the button "Reset",
 set count to 0.
 `;
 
+const DEFAULT_FUNCTIONS = 
+`/**
+ * Custom Functions for LingoUI
+ * Define custom widgets and actions here!
+ */
+
+// Custom card widget
+// Usage: Show a card with title "Hello" and description "World".
+export function card(root, title, description) {
+  const cardEl = document.createElement('div');
+  cardEl.style.cssText = 'border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin: 8px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);';
+  
+  const titleEl = document.createElement('h3');
+  titleEl.textContent = title;
+  titleEl.style.marginTop = '0';
+  cardEl.appendChild(titleEl);
+  
+  const descEl = document.createElement('p');
+  descEl.textContent = description;
+  descEl.style.marginBottom = '0';
+  descEl.style.color = '#666';
+  cardEl.appendChild(descEl);
+  
+  root.appendChild(cardEl);
+  return cardEl;
+}
+
+// Custom action: Add one to a signal
+// Usage: addOne count.
+export function addOne(signal) {
+  signal.set(signal.get() + 1);
+}
+
+// Custom action: Double a number
+// Usage: double count.
+export function double(signal) {
+  signal.set(signal.get() * 2);
+}
+
+// Custom action: Reset to zero
+// Usage: reset count.
+export function reset(signal) {
+  signal.set(0);
+}
+`;
+
 
 export default function Playground() {
   const [code, setCode] = useState(DEFAULT_CODE);
+  const [functions, setFunctions] = useState(DEFAULT_FUNCTIONS);
   const [compiledCode, setCompiledCode] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [showDocs, setShowDocs] = useState(false);
 
-  const compileCode = useCallback((lingoCode: string) => {
+  const compileCode = useCallback((lingoCode: string, customFunctions: string) => {
     try {
       const errorReporter = new ConsoleErrorReporter();
       const tokenizer = new LingoTokenizer(errorReporter);
@@ -70,7 +127,11 @@ export default function Playground() {
       
       // Add import for runtime functions
       const replaceCodeWithImports = result.code.replace("import { createSignal, createEffect, renderApp } from '@lingo-dsl/runtime';", "import { createSignal, createEffect, renderApp } from 'https://cdn.jsdelivr.net/npm/@lingo-dsl/runtime@0.1.0/+esm';");
+      
+      // Inject custom functions before the main code
       const codeWithImports = `
+${customFunctions}
+
 ${replaceCodeWithImports}
 `;
       
@@ -82,10 +143,15 @@ ${replaceCodeWithImports}
     }
   }, []);
 
-  // Compile on mount and when code changes
+  // Compile on mount and when code or functions change
   useEffect(() => {
-    compileCode(code);
-  }, [code, compileCode]);
+    compileCode(code, functions);
+  }, [code, functions, compileCode]);
+  const handleLoadExample = useCallback((exampleCode: string, exampleFunctions?: string) => {
+    setCode(exampleCode);
+    setFunctions(exampleFunctions || DEFAULT_FUNCTIONS);
+    setShowDocs(false); // Close the docs after loading an example
+  }, []);
 
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col bg-zinc-50 dark:bg-zinc-950">
@@ -97,25 +163,65 @@ ${replaceCodeWithImports}
           <span className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Lingo DSL Playground</span>
         </div>
         </Link>
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/">
-            <Home className="w-4 h-4 mr-2" />
-            Home
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline"
+            size="sm"
+            onClick={() => setShowDocs(!showDocs)}
+          >
+            <BookOpen className="w-4 h-4 mr-2" />
+            Docs & Examples
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/">
+              <Home className="w-4 h-4 mr-2" />
+              Home
+            </Link>
+          </Button>
+        </div>
       </nav>
 
       {/* Main Playground Grid */}
-      <div className="grid grid-cols-3 flex-1 overflow-hidden">
-        {/* Left Panel: Editor */}
-        <LingoEditor value={code} onChange={setCode} />
-        
-        {/* Middle Panel: Live Preview */}
-        <LivePreview compiledCode={compiledCode} error={error} />
-        
-        {/* Right Panel: Explain Mode */}
-        <ExplainMode compiledCode={compiledCode} />
+      <div className="flex flex-1 overflow-hidden">
+        <Group orientation="horizontal">
+          {/* Editor Panel */}
+          <Panel defaultSize={33} minSize={20}>
+            <LingoEditor 
+              lingoValue={code} 
+              functionsValue={functions}
+              onLingoChange={setCode}
+              onFunctionsChange={setFunctions}
+            />
+          </Panel>
+          
+          <Separator className="w-1 bg-zinc-200 dark:bg-zinc-800 hover:bg-violet-500 transition-colors" />
+          
+          {/* Preview Panel */}
+          <Panel defaultSize={34} minSize={20}>
+            <LivePreview compiledCode={compiledCode} error={error} />
+          </Panel>
+          
+          <Separator className="w-1 bg-zinc-200 dark:bg-zinc-800 hover:bg-violet-500 transition-colors" />
+          
+          {/* Explain Mode Panel */}
+          <Panel defaultSize={33} minSize={20}>
+            <ExplainMode compiledCode={compiledCode} />
+          </Panel>
+        </Group>
       </div>
+
+      {/* Documentation Sheet Overlay */}
+      <Sheet open={showDocs} onOpenChange={setShowDocs}>
+        <SheetContent side="right" className="w-full sm:w-[540px] md:w-[640px] lg:w-[740px] p-0">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Documentation & Examples</SheetTitle>
+            <SheetDescription>
+              Browse Lingo examples and documentation
+            </SheetDescription>
+          </SheetHeader>
+          <DocumentationPanel onLoadExample={handleLoadExample} />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
