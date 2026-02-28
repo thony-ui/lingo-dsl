@@ -409,15 +409,29 @@ export class JSCodeGenerator implements ICodeGenerator {
 
   private generateIfBlock(stmt: IfBlock): string {
     const condition = this.generateCondition(stmt);
-    let code = `createEffect(() => {\n`;
+    const containerId = `if_container_${this.widgetCounter++}`;
+
+    let code = `const ${containerId} = document.createElement('div');\n`;
+    code += `${this.indentLine(`root.appendChild(${containerId});`)}`;
+    code += `\n${this.indentLine(`createEffect(() => {`)}`;
 
     this.indent++;
-    code += `${this.indentLine(`if (${condition}) {`)}`;
+    code += `\n${this.indentLine(`if (${condition}) {`)}`;
 
     this.indent++;
-    code += `\n${this.indentLine("// Conditional rendering placeholder")}`;
-    // Note: Full conditional rendering would require more complex logic
-    // For v0.1, we're simplifying
+    code += `\n${this.indentLine(`${containerId}.innerHTML = '';`)}`;
+
+    // Generate code for each show statement in the body
+    for (const showStmt of stmt.body) {
+      const itemCode = this.generateShowStmtForLoop(showStmt, "", containerId);
+      code += `\n${this.indentLine(itemCode)}`;
+    }
+
+    this.indent--;
+    code += `\n${this.indentLine(`} else {`)}`;
+
+    this.indent++;
+    code += `\n${this.indentLine(`${containerId}.innerHTML = '';`)}`;
 
     this.indent--;
     code += `\n${this.indentLine("}")}`;
@@ -471,6 +485,15 @@ export class JSCodeGenerator implements ICodeGenerator {
     const widgetId = `el_${this.widgetCounter++}`;
     let code = "";
 
+    // Handle custom widgets
+    if (stmt.isCustom && stmt.config.type === "custom") {
+      const params = Object.values(stmt.config.params)
+        .map((val) => `"${val.replace(/"/g, '\\"')}"`)
+        .join(", ");
+      code += `customFunctions.${stmt.widget}(${containerId}, ${params});`;
+      return code;
+    }
+
     const elementType = this.getElementType(stmt.widget);
     code += `const ${widgetId} = document.createElement('${elementType}');`;
 
@@ -480,6 +503,14 @@ export class JSCodeGenerator implements ICodeGenerator {
         itemName,
       );
       code += ` ${widgetId}.textContent = ${template};`;
+    } else if (stmt.config.type === "called") {
+      // Handle input binding
+      const identifier = stmt.config.identifier;
+      code += ` ${widgetId}.value = ${identifier}.get();`;
+      code += ` ${widgetId}.addEventListener('input', (e) => ${identifier}.set(e.target.value));`;
+      code += ` createEffect(() => { ${widgetId}.value = ${identifier}.get(); });`;
+    } else if (stmt.config.type === "image") {
+      code += ` ${widgetId}.src = "${stmt.config.source}";`;
     }
 
     code += ` ${containerId}.appendChild(${widgetId});`;

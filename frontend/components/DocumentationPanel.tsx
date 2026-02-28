@@ -373,44 +373,412 @@ export default function DocumentationPanel({ onLoadExample }: DocumentationPanel
           ))}
         </Accordion>
 
-        {/* Quick Reference Section */}
-        <Card className="p-6 mt-8 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/20 dark:to-purple-950/20">
-          <h3 className="font-bold text-lg mb-3 text-zinc-900 dark:text-zinc-50">
-            🚀 Quick Reference
-          </h3>
-          <div className="space-y-4 text-sm">
-            <div>
-              <h4 className="font-semibold text-zinc-800 dark:text-zinc-200 mb-1">State Declaration</h4>
-              <code className="text-xs bg-white dark:bg-zinc-900 px-2 py-1 rounded">
-                There is a [type] called [name] starting at [value].
-              </code>
+        {/* Language Reference Section */}
+        <div className="space-y-4 mt-8">
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 border-b pb-2">
+            📖 Language Reference
+          </h2>
+
+          {/* Type System */}
+          <Card className="p-5 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
+            <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
+              📝 Type System
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div>
+                <h4 className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2">State Declaration</h4>
+                <code className="text-xs bg-white dark:bg-zinc-900 px-2 py-1 rounded block mb-2">
+                  There is a [type] called [name] starting at [value].
+                </code>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    🔢 Number
+                  </div>
+                  <code className="text-xs text-zinc-600 dark:text-zinc-400 block">
+                    There is a number called count starting at 0.
+                  </code>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-2">
+                    For numeric values (integers and decimals)
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    📄 Text
+                  </div>
+                  <code className="text-xs text-zinc-600 dark:text-zinc-400 block">
+                    There is a text called name starting at &quot;Alice&quot;.
+                  </code>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-2">
+                    For string values (must use quotes)
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    ✅ Boolean
+                  </div>
+                  <code className="text-xs text-zinc-600 dark:text-zinc-400 block">
+                    There is a boolean called isActive starting at true.
+                  </code>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-2">
+                    For true/false values
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    📋 List
+                  </div>
+                  <code className="text-xs text-zinc-600 dark:text-zinc-400 block">
+                    There is a list called items starting empty.
+                  </code>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-2">
+                    For arrays of items
+                  </p>
+                </div>
+              </div>
+              
+              <div className="bg-violet-50 dark:bg-violet-950/30 p-3 rounded-lg mt-3">
+                <p className="text-xs text-zinc-700 dark:text-zinc-300">
+                  <strong>💡 String Interpolation:</strong> Use <code className="bg-white dark:bg-zinc-900 px-1.5 py-0.5 rounded">{`{variableName}`}</code> to embed variables in strings
+                </p>
+                <code className="text-xs text-zinc-600 dark:text-zinc-400 block mt-2">
+                  Show a text saying &quot;Hello, {`{name}`}! You have {`{count}`} points.&quot;.
+                </code>
+              </div>
             </div>
-            <div>
-              <h4 className="font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Show Widget</h4>
-              <code className="text-xs bg-white dark:bg-zinc-900 px-2 py-1 rounded">
-                Show a [widget] saying &quot;[text]&quot;.
-              </code>
+          </Card>
+
+          {/* Widgets */}
+          <Card className="p-5 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+            <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
+              🎨 Widget Reference
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div>
+                <h4 className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2">Basic Syntax</h4>
+                <code className="text-xs bg-white dark:bg-zinc-900 px-2 py-1 rounded block">
+                  Show a [widget] saying &quot;[content]&quot;.
+                </code>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-2 mt-3">
+                <details className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <summary className="font-semibold text-zinc-800 dark:text-zinc-200 cursor-pointer text-xs">
+                    Interactive Widgets
+                  </summary>
+                  <div className="mt-2 space-y-2 text-xs">
+                    <div>
+                      <code className="text-violet-600 dark:text-violet-400">button</code>
+                      <span className="text-zinc-600 dark:text-zinc-400"> - Clickable button</span>
+                      <code className="block mt-1 text-[11px] text-zinc-500 dark:text-zinc-500">
+                        Show a button saying &quot;Click me&quot;.
+                      </code>
+                    </div>
+                    <div>
+                      <code className="text-violet-600 dark:text-violet-400">input</code>
+                      <span className="text-zinc-600 dark:text-zinc-400"> - Text input field (binds to variable)</span>
+                      <code className="block mt-1 text-[11px] text-zinc-500 dark:text-zinc-500">
+                        Show an input called username.
+                      </code>
+                    </div>
+                  </div>
+                </details>
+
+                <details className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <summary className="font-semibold text-zinc-800 dark:text-zinc-200 cursor-pointer text-xs">
+                    Text & Headings
+                  </summary>
+                  <div className="mt-2 space-y-2 text-xs">
+                    <div>
+                      <code className="text-violet-600 dark:text-violet-400">heading</code>
+                      <span className="text-zinc-600 dark:text-zinc-400"> - Large heading (h1)</span>
+                    </div>
+                    <div>
+                      <code className="text-violet-600 dark:text-violet-400">text</code>
+                      <span className="text-zinc-600 dark:text-zinc-400"> - Regular text (span)</span>
+                    </div>
+                    <div>
+                      <code className="text-violet-600 dark:text-violet-400">paragraph</code>
+                      <span className="text-zinc-600 dark:text-zinc-400"> - Paragraph (p)</span>
+                    </div>
+                  </div>
+                </details>
+
+                <details className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <summary className="font-semibold text-zinc-800 dark:text-zinc-200 cursor-pointer text-xs">
+                    Text Formatting
+                  </summary>
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                    <div><code className="text-violet-600 dark:text-violet-400">bold</code> - Bold text</div>
+                    <div><code className="text-violet-600 dark:text-violet-400">italic</code> - Italic text</div>
+                    <div><code className="text-violet-600 dark:text-violet-400">strong</code> - Strong emphasis</div>
+                    <div><code className="text-violet-600 dark:text-violet-400">emphasis</code> - Emphasized text</div>
+                    <div><code className="text-violet-600 dark:text-violet-400">underline</code> - Underlined text</div>
+                    <div><code className="text-violet-600 dark:text-violet-400">strikethrough</code> - Strikethrough text</div>
+                    <div><code className="text-violet-600 dark:text-violet-400">small</code> - Small text</div>
+                    <div><code className="text-violet-600 dark:text-violet-400">mark</code> - Highlighted text</div>
+                    <div><code className="text-violet-600 dark:text-violet-400">deleted</code> - Deleted text</div>
+                    <div><code className="text-violet-600 dark:text-violet-400">code</code> - Code snippet</div>
+                  </div>
+                </details>
+
+                <details className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <summary className="font-semibold text-zinc-800 dark:text-zinc-200 cursor-pointer text-xs">
+                    Layout & Structure
+                  </summary>
+                  <div className="mt-2 space-y-2 text-xs">
+                    <div>
+                      <code className="text-violet-600 dark:text-violet-400">container</code>
+                      <span className="text-zinc-600 dark:text-zinc-400"> - Generic container (div)</span>
+                    </div>
+                    <div>
+                      <code className="text-violet-600 dark:text-violet-400">section</code>
+                      <span className="text-zinc-600 dark:text-zinc-400"> - Section element</span>
+                    </div>
+                  </div>
+                </details>
+
+                <details className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <summary className="font-semibold text-zinc-800 dark:text-zinc-200 cursor-pointer text-xs">
+                    Links & Lists
+                  </summary>
+                  <div className="mt-2 space-y-2 text-xs">
+                    <div>
+                      <code className="text-violet-600 dark:text-violet-400">link</code>
+                      <span className="text-zinc-600 dark:text-zinc-400"> - Hyperlink</span>
+                    </div>
+                    <div>
+                      <code className="text-violet-600 dark:text-violet-400">unorderedlist</code>
+                      <span className="text-zinc-600 dark:text-zinc-400"> - Bullet list (ul)</span>
+                    </div>
+                    <div>
+                      <code className="text-violet-600 dark:text-violet-400">listitem</code>
+                      <span className="text-zinc-600 dark:text-zinc-400"> - List item (li)</span>
+                    </div>
+                  </div>
+                </details>
+
+                <details className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <summary className="font-semibold text-zinc-800 dark:text-zinc-200 cursor-pointer text-xs">
+                    Custom Widgets
+                  </summary>
+                  <div className="mt-2 space-y-2 text-xs">
+                    <p className="text-zinc-600 dark:text-zinc-400 mb-2">
+                      Define your own widgets in a <code className="bg-violet-50 dark:bg-violet-950/30 px-1.5 py-0.5 rounded">functions.js</code> file:
+                    </p>
+                    <code className="block text-[11px] text-zinc-500 dark:text-zinc-500 bg-zinc-50 dark:bg-zinc-950 p-2 rounded">
+                      Show a card with title &quot;Hello&quot; and description &quot;World&quot;.
+                    </code>
+                    <code className="block text-[11px] text-zinc-500 dark:text-zinc-500 bg-zinc-50 dark:bg-zinc-950 p-2 rounded">
+                      Show an alert with message &quot;Warning!&quot; and type &quot;warning&quot;.
+                    </code>
+                    <code className="block text-[11px] text-zinc-500 dark:text-zinc-500 bg-zinc-50 dark:bg-zinc-950 p-2 rounded">
+                      Show a badge with text &quot;New&quot; and color &quot;blue&quot;.
+                    </code>
+                  </div>
+                </details>
+              </div>
             </div>
-            <div>
-              <h4 className="font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Events</h4>
-              <code className="text-xs bg-white dark:bg-zinc-900 px-2 py-1 rounded">
-                When I click the button &quot;[name]&quot;, [action].
-              </code>
+          </Card>
+
+          {/* Actions */}
+          <Card className="p-5 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20">
+            <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
+              ⚡ Actions Reference
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-1 gap-3">
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    Number Actions
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    <code className="block text-zinc-600 dark:text-zinc-400">
+                      increase [variable] by [amount].
+                    </code>
+                    <code className="block text-zinc-600 dark:text-zinc-400">
+                      decrease [variable] by [amount].
+                    </code>
+                    <code className="block text-zinc-600 dark:text-zinc-400">
+                      set [variable] to [value].
+                    </code>
+                  </div>
+                  <div className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">
+                    Example: <code>increase count by 1.</code>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    Boolean Actions
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    <code className="block text-zinc-600 dark:text-zinc-400">
+                      toggle [variable].
+                    </code>
+                    <code className="block text-zinc-600 dark:text-zinc-400">
+                      set [variable] to [true/false].
+                    </code>
+                  </div>
+                  <div className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">
+                    Example: <code>toggle isActive.</code>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    Text Actions
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    <code className="block text-zinc-600 dark:text-zinc-400">
+                      set [variable] to &quot;[value]&quot;.
+                    </code>
+                  </div>
+                  <div className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">
+                    Example: <code>set username to &quot;Alice&quot;.</code>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    List Actions
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    <code className="block text-zinc-600 dark:text-zinc-400">
+                      add [value] to [list].
+                    </code>
+                  </div>
+                  <div className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">
+                    Example: <code>add inputText to todos.</code>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                  <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                    Custom Actions
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    <code className="block text-zinc-600 dark:text-zinc-400">
+                      [customAction] [variable].
+                    </code>
+                    <code className="block text-zinc-600 dark:text-zinc-400">
+                      [customAction] [variable] with [param] &quot;[value]&quot;.
+                    </code>
+                  </div>
+                  <div className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">
+                    Examples: <code>double count.</code> or <code>divideBy score with factor &quot;2&quot;.</code>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <h4 className="font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Actions</h4>
-              <code className="text-xs bg-white dark:bg-zinc-900 px-2 py-1 rounded block mb-1">
-                increase [var] by [amount].
-              </code>
-              <code className="text-xs bg-white dark:bg-zinc-900 px-2 py-1 rounded block mb-1">
-                set [var] to [value].
-              </code>
-              <code className="text-xs bg-white dark:bg-zinc-900 px-2 py-1 rounded block">
-                toggle [var].
-              </code>
+          </Card>
+
+          {/* Events */}
+          <Card className="p-5 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+            <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
+              🎯 Event Handling
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                <code className="text-xs block text-zinc-600 dark:text-zinc-400 mb-2">
+                  When I click the button &quot;[buttonText]&quot;,
+                </code>
+                <code className="text-xs block text-zinc-600 dark:text-zinc-400 ml-4">
+                  [action].
+                </code>
+                <div className="mt-3 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-950 p-2 rounded">
+                  <strong>Example:</strong>
+                  <code className="block mt-1 text-zinc-600 dark:text-zinc-400">
+                    When I click the button &quot;Submit&quot;,<br/>
+                    add inputText to todos.
+                  </code>
+                </div>
+              </div>
             </div>
-          </div>
-        </Card>
+          </Card>
+
+          {/* Conditionals */}
+          <Card className="p-5 bg-gradient-to-br from-rose-50 to-red-50 dark:from-rose-950/20 dark:to-red-950/20">
+            <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
+              🔀 Conditionals
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                  If Statement Syntax
+                </div>
+                <code className="text-xs block text-zinc-600 dark:text-zinc-400 mb-2">
+                  If [variable] is [operator] [value],
+                </code>
+                <code className="text-xs block text-zinc-600 dark:text-zinc-400 ml-4">
+                  [statement].
+                </code>
+              </div>
+
+              <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                  Comparison Operators
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div><code className="text-violet-600 dark:text-violet-400">equal to</code> - Equals</div>
+                  <div><code className="text-violet-600 dark:text-violet-400">not equal to</code> - Not equals</div>
+                  <div><code className="text-violet-600 dark:text-violet-400">greater than</code> - Greater than</div>
+                  <div><code className="text-violet-600 dark:text-violet-400">less than</code> - Less than</div>
+                  <div><code className="text-violet-600 dark:text-violet-400">greater than or equal to</code> - ≥</div>
+                  <div><code className="text-violet-600 dark:text-violet-400">less than or equal to</code> - ≤</div>
+                </div>
+              </div>
+
+              <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                  Examples
+                </div>
+                <div className="space-y-2 text-xs">
+                  <code className="block text-zinc-600 dark:text-zinc-400">
+                    If isLoggedIn is equal to true,<br/>
+                    show a text saying &quot;Welcome!&quot;.
+                  </code>
+                  <code className="block text-zinc-600 dark:text-zinc-400">
+                    If score is greater than 50,<br/>
+                    show a text saying &quot;High score!&quot;.
+                  </code>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Loops */}
+          <Card className="p-5 bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-950/20 dark:to-cyan-950/20">
+            <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
+              🔁 Loops
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
+                <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
+                  For-Each Loop
+                </div>
+                <code className="text-xs block text-zinc-600 dark:text-zinc-400 mb-2">
+                  For each [itemName] in [listVariable],
+                </code>
+                <code className="text-xs block text-zinc-600 dark:text-zinc-400 ml-4">
+                  [statement].
+                </code>
+                <div className="mt-3 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-950 p-2 rounded">
+                  <strong>Example:</strong>
+                  <code className="block mt-1 text-zinc-600 dark:text-zinc-400">
+                    For each todo in todos,<br/>
+                    show a text saying &quot;• {`{todo}`}&quot;.
+                  </code>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );
