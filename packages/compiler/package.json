@@ -1,0 +1,39 @@
+{
+  "name": "@lingo-dsl/compiler",
+  "version": "0.1.0",
+  "description": "Compiler for LingoUI - structured English to reactive UI",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "lingoui",
+    "compiler",
+    "parser",
+    "frontend",
+    "ui",
+    "reactive"
+  ],
+  "author": "Anthony Hermanto",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/lingo-code.git",
+    "directory": "packages/compiler"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.11.19",
+    "typescript": "^5.3.3"
+  }
+}
