@@ -34,35 +34,35 @@ export function useASTExtraction(ast: ReturnType<typeof useLingoAST>) {
   const stateDecls = useMemo(() => {
     if (!ast) return [];
     return ast.statements.filter(
-      (stmt): stmt is StateDecl => stmt.type === "STATE_DECL"
+      (stmt): stmt is StateDecl => stmt.type === "STATE_DECL",
     );
   }, [ast]);
 
   const showStmts = useMemo(() => {
     if (!ast) return [];
     return ast.statements.filter(
-      (stmt): stmt is ShowStmt => stmt.type === "SHOW_STMT"
+      (stmt): stmt is ShowStmt => stmt.type === "SHOW_STMT",
     );
   }, [ast]);
 
   const eventBlocks = useMemo(() => {
     if (!ast) return [];
     return ast.statements.filter(
-      (stmt): stmt is EventBlock => stmt.type === "EVENT_BLOCK"
+      (stmt): stmt is EventBlock => stmt.type === "EVENT_BLOCK",
     );
   }, [ast]);
 
   const ifBlocks = useMemo(() => {
     if (!ast) return [];
     return ast.statements.filter(
-      (stmt): stmt is IfBlock => stmt.type === "IF_BLOCK"
+      (stmt): stmt is IfBlock => stmt.type === "IF_BLOCK",
     );
   }, [ast]);
 
   const forEachBlocks = useMemo(() => {
     if (!ast) return [];
     return ast.statements.filter(
-      (stmt): stmt is ForEachBlock => stmt.type === "FOR_EACH_BLOCK"
+      (stmt): stmt is ForEachBlock => stmt.type === "FOR_EACH_BLOCK",
     );
   }, [ast]);
 

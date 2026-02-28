@@ -42,7 +42,7 @@ export function formatInitialValue(value: Value): string {
 
 export function evaluateCondition(
   ifBlock: IfBlock,
-  liveState: Record<string, unknown>
+  liveState: Record<string, unknown>,
 ): boolean {
   const { identifier, comparator, value } = ifBlock.condition;
   const currentValue = liveState[identifier];

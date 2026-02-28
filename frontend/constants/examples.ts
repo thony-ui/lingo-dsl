@@ -9,7 +9,8 @@ export interface Example {
 export const EXAMPLES: Example[] = [
   {
     title: "Counter App",
-    description: "Learn the basics: state, show statements, events, and actions",
+    description:
+      "Learn the basics: state, show statements, events, and actions",
     tags: ["Beginner", "State", "Events"],
     code: `# Simple Counter Example
 # Demonstrates: state, show statements, events, and actions
@@ -260,7 +261,8 @@ Show a paragraph saying "User {userName} is currently logged in.".`,
   },
   {
     title: "Styling & Layout",
-    description: "Use colors, alignment, and layout containers to style your UI",
+    description:
+      "Use colors, alignment, and layout containers to style your UI",
     tags: ["Styling", "Layout", "Design"],
     code: `# Styling Demo
 # Demonstrates: colored text, centered alignment, row and column layouts

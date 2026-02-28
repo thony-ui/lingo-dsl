@@ -135,6 +135,6 @@ function transformCompiledCode(code: string): string {
         return funcName === "createApp"
           ? `${isAsync}function createApp`
           : `customFunctions.${funcName} = ${isAsync}function`;
-      }
+      },
     );
 }
