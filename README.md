@@ -108,6 +108,17 @@ show a text saying "Third".
 
 ### Events & Actions
 
+**Page Load Events:**  
+Execute actions automatically when the page loads:
+
+```lingo
+On page load,
+loadInitialData facts.
+set count to 0.
+```
+
+**Click Events:**
+
 ```lingo
 When I click the button "Submit",
 increase score by 10.
@@ -115,6 +126,21 @@ set name to "Done".
 add item to list.
 remove item from list.
 toggle isOpen.
+```
+
+**Input Events:**
+
+```lingo
+When I type the input called searchBox,
+set query to searchBox.
+```
+
+**Custom Actions with Dynamic Variables:**  
+Pass variable values to custom functions using `{variableName}` syntax:
+
+```lingo
+When I click the button "Fetch",
+fetchData results with count "{numRecords}".
 ```
 
 ### Conditionals

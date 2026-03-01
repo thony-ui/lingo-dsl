@@ -63,7 +63,7 @@ export class LingoParser implements IParser {
       if (this.check(TokenType.SHOW)) {
         return this.parseShowStmt();
       }
-      if (this.check(TokenType.WHEN)) {
+      if (this.check(TokenType.WHEN) || this.check(TokenType.ON)) {
         return this.parseEventBlock();
       }
       if (this.check(TokenType.IF)) {
@@ -535,6 +535,39 @@ export class LingoParser implements IParser {
   private parseEventBlock(): EventBlock {
     const location = this.currentLocation();
 
+    // Handle "On page load," syntax
+    if (this.check(TokenType.ON)) {
+      this.consume(TokenType.ON, "Expected 'On'");
+      this.consume(TokenType.PAGE, "Expected 'page'");
+      this.consume(TokenType.LOAD, "Expected 'load'");
+      this.consume(TokenType.COMMA, "Expected ','");
+      this.skipNewlines();
+
+      const actions: ActionStmt[] = [];
+      while (!this.isAtEnd() && !this.isStatementStart()) {
+        if (this.check(TokenType.NEWLINE)) {
+          this.advance();
+          continue;
+        }
+
+        const action = this.parseActionStmt();
+        if (action) {
+          actions.push(action);
+        } else {
+          this.advance();
+        }
+      }
+
+      return {
+        type: ASTNodeType.EVENT_BLOCK,
+        verb: "load",
+        widgetRef: { type: "literal", widget: "div", label: "" }, // Dummy widget ref for load event
+        actions,
+        location,
+      };
+    }
+
+    // Handle "When I..." syntax
     this.consume(TokenType.WHEN, "Expected 'When'");
     this.consume(TokenType.I, "Expected 'I'");
 

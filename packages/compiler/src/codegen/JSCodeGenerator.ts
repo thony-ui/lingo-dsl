@@ -383,6 +383,18 @@ export class JSCodeGenerator implements ICodeGenerator {
 
   private generateEventBlock(stmt: EventBlock): string {
     const widget = stmt.widgetRef;
+
+    // Handle "On page load," events - execute immediately
+    if (stmt.verb === "load") {
+      let code = "// Execute on page load\n";
+      for (const action of stmt.actions) {
+        const actionCode = this.generateAction(action.action);
+        code += `${this.indentLine(actionCode)}\n`;
+      }
+      return code.trimEnd();
+    }
+
+    // Handle normal click/type events
     const eventType = stmt.verb === "click" ? "click" : "input";
     const handlerVar = `handler_${this.eventCounter++}`;
 
@@ -452,7 +464,16 @@ export class JSCodeGenerator implements ICodeGenerator {
         // Generate call to custom function: customFunctions.actionName(signal, params...)
         if (action.params && Object.keys(action.params).length > 0) {
           const paramValues = Object.values(action.params)
-            .map((val) => `"${val.replace(/"/g, '\\"')}"`)
+            .map((val) => {
+              // Check if parameter is a variable reference like "{variableName}"
+              const varMatch = val.match(/^\{([a-zA-Z_][a-zA-Z0-9_]*)\}$/);
+              if (varMatch) {
+                // Pass the signal object itself (not .get()) so functions can call .set() or .get() as needed
+                return `${varMatch[1]}`;
+              }
+              // Otherwise pass as a literal string
+              return `"${val.replace(/"/g, '\\"')}"`;
+            })
             .join(", ");
           return `customFunctions.${action.name}(${action.identifier}, ${paramValues});`;
         } else {

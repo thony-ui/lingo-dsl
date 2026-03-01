@@ -150,72 +150,6 @@ reset clicks.
 
 When I click the button "Divide By",
 divideBy clicks with factor "2".`,
-    functions: `// Custom card widget
-export function card(root, title, description) {
-  const cardEl = document.createElement('div');
-  cardEl.style.cssText = 'border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin: 8px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);';
-  
-  const titleEl = document.createElement('h3');
-  titleEl.textContent = title;
-  titleEl.style.marginTop = '0';
-  cardEl.appendChild(titleEl);
-  
-  const descEl = document.createElement('p');
-  descEl.textContent = description;
-  descEl.style.marginBottom = '0';
-  descEl.style.color = '#666';
-  cardEl.appendChild(descEl);
-  
-  root.appendChild(cardEl);
-  return cardEl;
-}
-
-// Custom alert widget
-export function alert(root, message, type = 'info') {
-  const alertEl = document.createElement('div');
-  const colors = {
-    info: '#2196F3',
-    warning: '#FF9800',
-    error: '#f44336',
-    success: '#4CAF50',
-  };
-  
-  alertEl.style.cssText = 'background-color: ' + (colors[type] || colors.info) + '22; border-left: 4px solid ' + (colors[type] || colors.info) + '; padding: 12px 16px; margin: 8px 0; border-radius: 4px;';
-  
-  alertEl.textContent = message;
-  root.appendChild(alertEl);
-  return alertEl;
-}
-
-// Custom badge widget
-export function badge(root, text, color) {
-  const badgeEl = document.createElement('span');
-  badgeEl.textContent = text;
-  badgeEl.style.cssText = 'display: inline-block; background-color: ' + color + '; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; margin: 4px;';
-  
-  root.appendChild(badgeEl);
-  return badgeEl;
-}
-
-// Custom action: Add one
-export function addOne(signal) {
-  signal.set(signal.get() + 1);
-}
-
-// Custom action: Double
-export function double(signal) {
-  signal.set(signal.get() * 2);
-}
-
-// Custom action: Reset
-export function reset(signal) {
-  signal.set(0);
-}
-
-// Custom action: Divide by factor
-export function divideBy(signal, factor) {
-  signal.set(signal.get() / parseInt(factor, 10));
-}`,
   },
   {
     title: "Text Formatting",
@@ -296,10 +230,15 @@ increase count by 1.`,
     description: "Make API calls and display dynamic data",
     tags: ["API", "Dynamic Data", "Advanced"],
     code: `# Cat Facts API Example
-# Demonstrates: API calls with custom functions and displaying fetched data
+# Demonstrates: API calls with custom functions, loading states, and conditional rendering
 
 There is a list called facts starting empty.
 There is a number called factCount starting at 3.
+There is a boolean called isLoading starting at true.
+
+# Auto-load 5 cat facts when page loads
+On page load,
+loadInitialMeowFacts facts with loading "{isLoading}".
 
 Show a heading saying "🐱 Cat Facts from MeowFacts API".
 
@@ -307,16 +246,201 @@ Show a text saying "Number of facts to fetch: {factCount}".
 Show a button saying "Fetch Cat Facts".
 Show a button saying "Fetch More (5 facts)".
 
-# Fetch facts when button clicked
-When I click the button "Fetch Cat Facts",
-fetchMeowFacts facts.
-
-When I click the button "Fetch More (5 facts)",
-fetchMultipleMeowFacts facts with count "5".
+# Show loader while fetching
+If isLoading is equal to true,
+show a loader.
 
 # Display all fetched facts
 For each fact in facts,
 show a text saying "🐱 {fact}".
+
+# Fetch facts when button clicked
+When I click the button "Fetch Cat Facts",
+fetchMeowFacts facts with loading "{isLoading}".
+
+When I click the button "Fetch More (5 facts)",
+fetchMultipleMeowFacts facts with count "{factCount}" and loading "{isLoading}".
+
 `,
   },
 ];
+
+export const DEFAULT_CODE = `# Simple Counter Example
+# Demonstrates: state, show statements, events, and actions
+
+There is a number called count starting at 0.
+
+Show a heading saying "Counter App".
+Show a text saying "hello world".
+Show a text saying "Current count: {count}".
+
+Show a button saying "Increment".
+Show a button saying "Decrement".
+Show a button saying "Reset".
+
+When I click the button "Increment",
+increase count by 1.
+
+When I click the button "Decrement",
+decrease count by 1.
+
+When I click the button "Reset",
+set count to 0.
+`;
+
+export const DEFAULT_FUNCTIONS = `/**
+ * Custom Functions for LingoUI
+ * Define custom widgets and actions here!
+ */
+
+// Custom card widget
+// Usage: Show a card with title "Hello" and description "World".
+export function card(root, title, description) {
+  const cardEl = document.createElement('div');
+  cardEl.style.cssText = 'border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin: 8px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);';
+  
+  const titleEl = document.createElement('h3');
+  titleEl.textContent = title;
+  titleEl.style.marginTop = '0';
+  cardEl.appendChild(titleEl);
+  
+  const descEl = document.createElement('p');
+  descEl.textContent = description;
+  descEl.style.marginBottom = '0';
+  descEl.style.color = '#666';
+  cardEl.appendChild(descEl);
+  
+  root.appendChild(cardEl);
+  return cardEl;
+}
+
+export function alert(root, message, type) {
+  const alertEl = document.createElement('div');
+  alertEl.textContent = message;
+  alertEl.style.cssText = 'padding: 12px 16px; border-radius: 4px; margin: 8px 0; color: white;';
+  
+  switch(type) {
+    case 'success':
+      alertEl.style.backgroundColor = '#4caf50';
+      break;
+    case 'warning':
+      alertEl.style.backgroundColor = '#ff9800';
+      break;
+    case 'error':
+      alertEl.style.backgroundColor = '#f44336';
+      break;
+    default:
+      alertEl.style.backgroundColor = '#2196f3';
+  }
+  
+  root.appendChild(alertEl);
+  return alertEl;
+}
+  
+export function badge(root, text, color) {
+  const badgeEl = document.createElement('span');
+  badgeEl.textContent = text;
+  badgeEl.style.cssText = \`display: inline-block; padding: 4px 8px; border-radius: 12px; background-color: \${color}; color: white; font-size: 12px; margin: 4px;\`;
+  root.appendChild(badgeEl);
+  return badgeEl;
+}
+
+// Custom loader widget
+// Usage: Show a loader.
+export function loader(root) {
+  const loaderEl = document.createElement('div');
+  loaderEl.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 16px; margin: 16px 0; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; color: #0369a1;';
+  
+  const spinner = document.createElement('div');
+  spinner.style.cssText = 'width: 20px; height: 20px; border: 3px solid #bae6fd; border-top-color: #0369a1; border-radius: 50%; animation: spin 1s linear infinite;';
+  
+  // Add keyframe animation
+  if (!document.getElementById('spinner-style')) {
+    const style = document.createElement('style');
+    style.id = 'spinner-style';
+    style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+    document.head.appendChild(style);
+  }
+  
+  const text = document.createElement('span');
+  text.textContent = '⏳ Loading data...';
+  text.style.fontWeight = '500';
+  
+  loaderEl.appendChild(spinner);
+  loaderEl.appendChild(text);
+  root.appendChild(loaderEl);
+  return loaderEl;
+}
+
+// Custom action: Add one to a signal
+// Usage: addOne count.
+export function addOne(signal) {
+  signal.set(signal.get() + 1);
+}
+
+// Custom action: Double a number
+// Usage: double count.
+export function double(signal) {
+  signal.set(signal.get() * 2);
+}
+
+// Custom action: Reset to zero
+// Usage: reset count.
+export function reset(signal) {
+  signal.set(0);
+}
+export async function fetchMeowFacts(signal, loading) {
+  try {
+    loading.set(true);
+    const response = await fetch('https://meowfacts.herokuapp.com/');
+    const data = await response.json();
+    
+    // The API returns { data: ["fact1", "fact2", ...] }
+    if (data && data.data) {
+      signal.set(data.data);
+    }
+  } catch (error) {
+    console.error('Failed to fetch cat facts:', error);
+    signal.set(['Failed to fetch cat facts. Please try again.']);
+  } finally {
+    loading.set(false);
+  }
+}
+export async function fetchMultipleMeowFacts(signal, count, loading) {
+  try {
+    loading.set(true);
+    const response = await fetch(\`https://meowfacts.herokuapp.com/?count=\${count.get()}\`);
+    const data = await response.json();
+    
+    if (data && data.data) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      signal.set(data.data);
+    }
+  } catch (error) {
+    console.error('Failed to fetch cat facts:', error);
+    signal.set(['Failed to fetch cat facts. Please try again.']);
+  } finally {
+    loading.set(false);
+  }
+}
+
+// Custom action: Load initial cat facts on page load
+// Usage: loadInitialMeowFacts facts with loading isLoading.
+export async function loadInitialMeowFacts(signal, loading) {
+  try {
+    loading.set(true);
+    const response = await fetch('https://meowfacts.herokuapp.com/?count=5');
+    const data = await response.json();
+    
+    if (data && data.data) {
+      signal.set(data.data);
+    }
+  } catch (error) {
+    console.error('Failed to fetch cat facts:', error);
+    signal.set(['Failed to fetch cat facts. Please try again.']);
+  } finally {
+    loading.set(false);
+  }
+}
+
+`;

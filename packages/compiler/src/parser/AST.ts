@@ -138,7 +138,7 @@ export type ShowConfig =
   | { type: "custom"; params: Record<string, string> } // Custom widget parameters
   | { type: "empty" };
 
-export type EventVerb = "click" | "type";
+export type EventVerb = "click" | "type" | "load";
 
 export interface EventBlock extends ASTNode {
   type: ASTNodeType.EVENT_BLOCK;

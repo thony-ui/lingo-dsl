@@ -47,6 +47,7 @@ function ActionCategories() {
       actions: [
         { syntax: "[customAction] [variable].", example: "double count." },
         { syntax: '[customAction] [variable] with [param] "[value]".', example: 'divideBy score with factor "2".' },
+        { syntax: '[customAction] [variable] with [param] "{variableName}".', example: 'fetchData results with count "{numRecords}".' },
       ],
     },
   ];

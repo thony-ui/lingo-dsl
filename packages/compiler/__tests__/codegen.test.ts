@@ -270,6 +270,95 @@ increase y by 2.`;
       expect(code).toContain("x.set(x.get() + 1)");
       expect(code).toContain("y.set(y.get() + 2)");
     });
+
+    it("should generate custom action with dynamic variable parameter", () => {
+      const source = `When I click the button "Fetch",
+fetchData results with count "{numRecords}".`;
+      const code = generate(source);
+
+      // Should pass the signal object itself, not the literal string
+      expect(code).toContain("customFunctions.fetchData(results, numRecords)");
+      // Should NOT contain the literal string "{numRecords}"
+      expect(code).not.toContain('"{numRecords}"');
+    });
+
+    it("should generate custom action with literal string parameter", () => {
+      const source = `When I click the button "Fetch",
+fetchData results with count "5".`;
+      const code = generate(source);
+
+      // Should pass literal strings as-is
+      expect(code).toContain('customFunctions.fetchData(results, "5")');
+    });
+
+    it("should generate custom action without parameters", () => {
+      const source = `When I click the button "Refresh",
+refreshCache data.`;
+      const code = generate(source);
+
+      expect(code).toContain("customFunctions.refreshCache(data)");
+    });
+  });
+
+  describe("Page Load Event Generation", () => {
+    it("should generate on page load event", () => {
+      const source = `On page load,
+set count to 10.`;
+      const code = generate(source);
+
+      // Should execute immediately, not wrapped in addEventListener
+      expect(code).toContain("// Execute on page load");
+      expect(code).toContain("count.set(10)");
+      expect(code).not.toContain("addEventListener");
+    });
+
+    it("should generate page load with custom action", () => {
+      const source = `On page load,
+loadData facts.`;
+      const code = generate(source);
+
+      expect(code).toContain("// Execute on page load");
+      expect(code).toContain("customFunctions.loadData(facts)");
+    });
+
+    it("should generate page load with multiple actions", () => {
+      const source = `On page load,
+set count to 5.
+set name to "Initial".
+loadData results.`;
+      const code = generate(source);
+
+      expect(code).toContain("// Execute on page load");
+      expect(code).toContain("count.set(5)");
+      expect(code).toContain('name.set("Initial")');
+      expect(code).toContain("customFunctions.loadData(results)");
+    });
+
+    it("should generate page load with dynamic variable parameter", () => {
+      const source = `On page load,
+fetchData results with count "{initialCount}".`;
+      const code = generate(source);
+
+      expect(code).toContain("// Execute on page load");
+      expect(code).toContain(
+        "customFunctions.fetchData(results, initialCount)",
+      );
+    });
+
+    it("should combine page load event with click events", () => {
+      const source = `On page load,
+set count to 0.
+
+When I click the button "Increment",
+increase count by 1.`;
+      const code = generate(source);
+
+      // Should have both load event and click event
+      expect(code).toContain("// Execute on page load");
+      expect(code).toContain("count.set(0)");
+      expect(code).toContain("addEventListener('click'");
+      expect(code).toContain("count.set(count.get() + 1)");
+    });
   });
 
   describe("Conditional Generation", () => {
