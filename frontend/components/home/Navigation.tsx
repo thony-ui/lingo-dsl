@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Github, ArrowRight } from "lucide-react";
+import { Sparkles, Github, ArrowRight, BookOpen } from "lucide-react";
 
 export function Navigation() {
   return (
@@ -26,16 +26,23 @@ function Logo() {
 
 function NavigationActions() {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2 md:gap-4">
       <Button variant="ghost" size="sm" asChild>
         <Link href="https://github.com/thony-ui/lingo-dsl" target="_blank">
-          <Github className="w-4 h-4 mr-2" />
-          GitHub
+          <Github className="w-4 h-4 md:mr-2" />
+          <span className="hidden md:inline">GitHub</span>
+        </Link>
+      </Button>
+      <Button variant="ghost" size="sm" asChild>
+        <Link href="/docs">
+          <BookOpen className="w-4 h-4 md:mr-2" />
+          <span className="hidden md:inline">Documentation</span>
         </Link>
       </Button>
       <Button asChild>
         <Link href="/playground">
-          Playground
+          <span className="hidden md:inline">Playground</span>
+          <span className="md:hidden">Play</span>
           <ArrowRight className="w-4 h-4 ml-2" />
         </Link>
       </Button>
