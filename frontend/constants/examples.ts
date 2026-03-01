@@ -391,6 +391,7 @@ export function reset(signal) {
 }
 export async function fetchMeowFacts(signal, loading) {
   try {
+    signal.set([]); // Clear existing facts
     loading.set(true);
     const response = await fetch('https://meowfacts.herokuapp.com/');
     const data = await response.json();
@@ -408,6 +409,7 @@ export async function fetchMeowFacts(signal, loading) {
 }
 export async function fetchMultipleMeowFacts(signal, count, loading) {
   try {
+    signal.set([]); // Clear existing facts
     loading.set(true);
     const response = await fetch(\`https://meowfacts.herokuapp.com/?count=\${count.get()}\`);
     const data = await response.json();

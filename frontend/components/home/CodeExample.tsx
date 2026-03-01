@@ -68,7 +68,7 @@ interface CodeBlockProps {
 function CodeBlock({ code }: CodeBlockProps) {
   return (
     <div className="bg-zinc-900 dark:bg-zinc-950 p-8">
-      <pre className="text-sm text-zinc-100 font-mono leading-relaxed">
+      <pre className="text-sm text-zinc-100 font-mono leading-relaxed overflow-x-auto">
         <code className="language-lingo">{code}</code>
       </pre>
     </div>
