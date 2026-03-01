@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Github, ArrowRight, BookOpen } from "lucide-react";
+import { Sparkles, Github, ArrowRight, BookOpen, Network } from "lucide-react";
 
 export function Navigation() {
   return (
@@ -36,7 +36,13 @@ function NavigationActions() {
       <Button variant="ghost" size="sm" asChild>
         <Link href="/docs">
           <BookOpen className="w-4 h-4 md:mr-2" />
-          <span className="hidden md:inline">Documentation</span>
+          <span className="hidden md:inline">Docs</span>
+        </Link>
+      </Button>
+      <Button variant="ghost" size="sm" asChild>
+        <Link href="/explorer">
+          <Network className="w-4 h-4 md:mr-2" />
+          <span className="hidden md:inline">Explorer</span>
         </Link>
       </Button>
       <Button asChild>

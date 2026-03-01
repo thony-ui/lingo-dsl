@@ -21,7 +21,7 @@ export default function LingoEditor({
   return (
     <Tabs
       defaultValue="lingo"
-      className="h-full w-full border-r border-zinc-200 dark:border-zinc-800 flex flex-col"
+      className="h-full min-h-[400px] w-full border border-zinc-200 dark:border-zinc-800 rounded-lg flex flex-col overflow-hidden"
     >
       <EditorHeader />
       <EditorTabs
@@ -36,14 +36,14 @@ export default function LingoEditor({
 
 function EditorHeader() {
   return (
-    <div className="bg-gradient-to-r from-violet-50 to-blue-50 dark:from-zinc-900 dark:to-zinc-900 px-2 sm:px-4 py-2 border-b border-zinc-200 dark:border-zinc-800">
-      <TabsList className="grid w-full grid-cols-2 h-8 sm:h-9">
-        <TabsTrigger value="lingo" className="text-xs">
-          <Code2 className="w-3.5 h-3.5 mr-1 sm:mr-1.5" />
-          <span className="hidden xs:inline">Lingo </span>Code
+    <div className="bg-gradient-to-r from-violet-50 to-blue-50 dark:from-zinc-900 dark:to-zinc-900 px-2 sm:px-4 py-2 sm:py-3 border-b border-zinc-200 dark:border-zinc-800 flex-shrink-0">
+      <TabsList className="grid w-full grid-cols-2 h-9 sm:h-10">
+        <TabsTrigger value="lingo" className="text-xs sm:text-sm">
+          <Code2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
+          <span className="hidden sm:inline">Lingo </span>Code
         </TabsTrigger>
-        <TabsTrigger value="functions" className="text-xs">
-          <Braces className="w-3.5 h-3.5 mr-1 sm:mr-1.5" />
+        <TabsTrigger value="functions" className="text-xs sm:text-sm">
+          <Braces className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
           <span className="truncate">functions.js</span>
         </TabsTrigger>
       </TabsList>
