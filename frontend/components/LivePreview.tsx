@@ -24,9 +24,9 @@ export default function LivePreview({ compiledCode, error }: LivePreviewProps) {
 
 function PreviewHeader() {
   return (
-    <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-zinc-900 dark:to-zinc-900 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2">
+    <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-zinc-900 dark:to-zinc-900 px-2 sm:px-4 py-2 sm:py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2">
       <LiveIndicator />
-      <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+      <h2 className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100">
         Live Preview
       </h2>
     </div>

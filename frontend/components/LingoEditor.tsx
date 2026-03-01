@@ -36,15 +36,15 @@ export default function LingoEditor({
 
 function EditorHeader() {
   return (
-    <div className="bg-gradient-to-r from-violet-50 to-blue-50 dark:from-zinc-900 dark:to-zinc-900 px-4 py-2 border-b border-zinc-200 dark:border-zinc-800">
-      <TabsList className="grid w-full grid-cols-2 h-9">
+    <div className="bg-gradient-to-r from-violet-50 to-blue-50 dark:from-zinc-900 dark:to-zinc-900 px-2 sm:px-4 py-2 border-b border-zinc-200 dark:border-zinc-800">
+      <TabsList className="grid w-full grid-cols-2 h-8 sm:h-9">
         <TabsTrigger value="lingo" className="text-xs">
-          <Code2 className="w-3.5 h-3.5 mr-1.5" />
-          Lingo Code
+          <Code2 className="w-3.5 h-3.5 mr-1 sm:mr-1.5" />
+          <span className="hidden xs:inline">Lingo </span>Code
         </TabsTrigger>
         <TabsTrigger value="functions" className="text-xs">
-          <Braces className="w-3.5 h-3.5 mr-1.5" />
-          functions.js
+          <Braces className="w-3.5 h-3.5 mr-1 sm:mr-1.5" />
+          <span className="truncate">functions.js</span>
         </TabsTrigger>
       </TabsList>
     </div>

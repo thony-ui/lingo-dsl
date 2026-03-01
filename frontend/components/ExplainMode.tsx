@@ -40,9 +40,9 @@ export default function ExplainMode({
 
 function ExplainModeHeader() {
   return (
-    <div className="bg-linear-to-r from-blue-50 to-violet-50 dark:from-zinc-900 dark:to-zinc-900 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2">
-      <FileCode className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-      <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+    <div className="bg-gradient-to-r from-blue-50 to-violet-50 dark:from-zinc-900 dark:to-zinc-900 px-2 sm:px-4 py-2 sm:py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2">
+      <FileCode className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400" />
+      <h2 className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100">
         Explain Mode
       </h2>
     </div>
@@ -67,7 +67,7 @@ function ExplainModeContent({
   compiledCode,
 }: ExplainModeContentProps) {
   return (
-    <div className="p-4 space-y-3 bg-zinc-50 dark:bg-zinc-900/50">
+    <div className="p-2 sm:p-4 space-y-2 sm:space-y-3 bg-zinc-50 dark:bg-zinc-900/50">
       <StateVariablesCard stateDecls={stateDecls} />
       <UIElementsCard showStmts={showStmts} />
       <EventHandlersCard eventBlocks={eventBlocks} />

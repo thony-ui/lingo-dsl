@@ -8,6 +8,7 @@ import LivePreview from "@/components/LivePreview";
 import ExplainMode from "@/components/ExplainMode";
 import DocumentationPanel from "@/components/DocumentationPanel";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Sheet,
   SheetContent,
@@ -15,7 +16,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Sparkles, Home, BookOpen } from "lucide-react";
+import { Sparkles, Home, BookOpen, Code2, Eye, FileCode } from "lucide-react";
 import { 
   Compiler,
   LingoTokenizer,
@@ -105,33 +106,35 @@ ${replaceCodeWithImports}
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col bg-zinc-50 dark:bg-zinc-950">
       {/* Header Navigation */}
-      <nav className="border-b bg-white dark:bg-zinc-900 px-4 py-3 flex items-center justify-between shrink-0">
-        <Link href="/" className="flex items-center gap-2">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-          <span className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Lingo DSL Playground</span>
-        </div>
+      <nav className="border-b bg-white dark:bg-zinc-900 px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between shrink-0">
+        <Link href="/" className="flex items-center gap-1 sm:gap-2">
+          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-violet-600 dark:text-violet-400" />
+          <span className="text-sm sm:text-lg font-bold text-zinc-900 dark:text-zinc-50 truncate max-w-30 sm:max-w-none">
+            Lingo DSL
+            <span className="hidden sm:inline"> Playground</span>
+          </span>
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <Button 
             variant="outline"
             size="sm"
             onClick={() => setShowDocs(!showDocs)}
+            className="h-8 px-2 sm:px-3"
           >
-            <BookOpen className="w-4 h-4 mr-2" />
-            Docs & Examples
+            <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Docs</span>
           </Button>
-          <Button variant="outline" size="sm" asChild>
+          <Button variant="outline" size="sm" asChild className="h-8 px-2 sm:px-3">
             <Link href="/">
-              <Home className="w-4 h-4 mr-2" />
-              Home
+              <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Home</span>
             </Link>
           </Button>
         </div>
       </nav>
 
-      {/* Main Playground Grid */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* Desktop: Resizable Panels */}
+      <div className="hidden md:flex flex-1 overflow-hidden">
         <Group orientation="horizontal">
           {/* Editor Panel */}
           <Panel defaultSize={33} minSize={20}>
@@ -159,6 +162,40 @@ ${replaceCodeWithImports}
         </Group>
       </div>
 
+      {/* Mobile: Tabbed Layout */}
+      <div className="flex md:hidden flex-1 overflow-hidden">
+        <Tabs defaultValue="editor" className="w-full h-full flex flex-col">
+          <TabsList className="grid w-full grid-cols-3 rounded-none border-b h-auto shrink-0">
+            <TabsTrigger value="editor" className="text-xs">
+              <Code2 className="w-3.5 h-3.5 mr-1.5" />
+              Editor
+            </TabsTrigger>
+            <TabsTrigger value="preview" className="text-xs">
+              <Eye className="w-3.5 h-3.5 mr-1.5" />
+              Preview
+            </TabsTrigger>
+            <TabsTrigger value="explain" className="text-xs">
+              <FileCode className="w-3.5 h-3.5 mr-1.5" />
+              Explain
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="editor" className="flex-1 m-0 overflow-hidden">
+            <LingoEditor 
+              lingoValue={code} 
+              functionsValue={functions}
+              onLingoChange={setCode}
+              onFunctionsChange={setFunctions}
+            />
+          </TabsContent>
+          <TabsContent value="preview" className="flex-1 m-0 overflow-hidden">
+            <LivePreview compiledCode={compiledCode} error={error} />
+          </TabsContent>
+          <TabsContent value="explain" className="flex-1 m-0 overflow-hidden">
+            <ExplainMode compiledCode={compiledCode} lingoCode={code} liveState={liveState} />
+          </TabsContent>
+        </Tabs>
+      </div>
+
       {/* Documentation Sheet Overlay */}
       <Sheet open={showDocs} onOpenChange={setShowDocs}>
         <SheetContent side="right" className="w-full sm:w-135 md:w-160 lg:w-185 p-0">
@@ -168,7 +205,7 @@ ${replaceCodeWithImports}
               Browse Lingo examples and documentation
             </SheetDescription>
           </SheetHeader>
-          <DocumentationPanel onLoadExample={handleLoadExample} />
+          <DocumentationPanel onLoadExample={handleLoadExample} onClose={() => setShowDocs(false)} />
         </SheetContent>
       </Sheet>
     </div>
