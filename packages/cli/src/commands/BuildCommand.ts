@@ -46,7 +46,8 @@ export class BuildCommand implements ICommand {
     const combinedSource = sources.join("\n\n");
 
     // Use auto-detected JS files
-    const customFunctionsPath = this.jsFiles.length > 0 ? this.jsFiles[0] : undefined;
+    const customFunctionsPath =
+      this.jsFiles.length > 0 ? this.jsFiles[0] : undefined;
 
     // Compile all files as one
     const result = this.compiler.compile(combinedSource, lingoFiles[0], {
@@ -61,25 +62,16 @@ export class BuildCommand implements ICommand {
 
       // Process code: Replace runtime and custom function imports
       let code = result.code;
-      
+
       // Replace runtime import with relative path
-      code = code.replace(
-        "from '@lingo-dsl/runtime'",
-        "from './runtime.js'",
-      );
+      code = code.replace("from '@lingo-dsl/runtime'", "from './runtime.js'");
 
       // Replace custom functions import paths
       this.jsFiles.forEach((jsFile, index) => {
         const fileName = path.basename(jsFile);
         const relativePath = path.relative(process.cwd(), jsFile);
-        code = code.replace(
-          `from '${relativePath}'`,
-          `from './${fileName}'`,
-        );
-        code = code.replace(
-          `from '${jsFile}'`,
-          `from './${fileName}'`,
-        );
+        code = code.replace(`from '${relativePath}'`, `from './${fileName}'`);
+        code = code.replace(`from '${jsFile}'`, `from './${fileName}'`);
       });
 
       // Write compiled code
@@ -165,7 +157,7 @@ export class BuildCommand implements ICommand {
 
   private bundleRuntime(distDir: string): void {
     console.log("Bundling runtime...");
-    
+
     // Create a minimal runtime bundle for production
     const runtimeCode = `
 // LingoUI Runtime - Production Bundle

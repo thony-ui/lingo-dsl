@@ -6,6 +6,8 @@ import { Compiler } from "@lingo-dsl/compiler";
 
 export class DevCommand implements ICommand {
   private jsFiles: string[] = [];
+  private sseClients: http.ServerResponse[] = [];
+  private watchers: fs.FSWatcher[] = [];
 
   constructor(private compiler: Compiler) {}
 
@@ -17,7 +19,7 @@ export class DevCommand implements ICommand {
     this.jsFiles = this.findJSFiles(srcDir);
     if (this.jsFiles.length > 0) {
       console.log(`Found ${this.jsFiles.length} JavaScript file(s)`);
-      this.jsFiles.forEach(file => {
+      this.jsFiles.forEach((file) => {
         console.log(`  - ${path.relative(process.cwd(), file)}`);
       });
     }
@@ -37,10 +39,26 @@ export class DevCommand implements ICommand {
       } else if (url === "/runtime.js") {
         res.writeHead(200, { "Content-Type": "application/javascript" });
         res.end(this.generateRuntimeStub());
+      } else if (url === "/events") {
+        // Server-Sent Events endpoint for hot reload
+        res.writeHead(200, {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          Connection: "keep-alive",
+        });
+        res.write("data: connected\n\n");
+
+        this.sseClients.push(res);
+
+        req.on("close", () => {
+          this.sseClients = this.sseClients.filter((client) => client !== res);
+        });
       } else if (url.startsWith("/custom-") && url.endsWith(".js")) {
         // Serve auto-detected custom JS files
         const fileName = url.replace("/custom-", "");
-        const matchingFile = this.jsFiles.find(f => path.basename(f) === fileName);
+        const matchingFile = this.jsFiles.find(
+          (f) => path.basename(f) === fileName,
+        );
         if (matchingFile) {
           try {
             const jsCode = fs.readFileSync(matchingFile, "utf-8");
@@ -63,7 +81,58 @@ export class DevCommand implements ICommand {
     server.listen(port, () => {
       console.log(`\n✓ Dev server running at http://localhost:${port}`);
       console.log(`  Serving files from: ${srcDir}`);
+      console.log(`  🔥 Hot reload enabled`);
       console.log("\n  Press Ctrl+C to stop\n");
+
+      // Setup file watching for hot reload
+      this.setupFileWatcher(srcDir);
+    });
+
+    // Clean up watchers on exit
+    process.on("SIGINT", () => {
+      this.watchers.forEach((watcher) => watcher.close());
+      process.exit(0);
+    });
+  }
+
+  private setupFileWatcher(srcDir: string): void {
+    if (!fs.existsSync(srcDir)) {
+      return;
+    }
+
+    // Watch the src directory recursively
+    const watcher = fs.watch(
+      srcDir,
+      { recursive: true },
+      (eventType, filename) => {
+        if (
+          filename &&
+          (filename.endsWith(".lingo") || filename.endsWith(".js"))
+        ) {
+          console.log(`\n📝 File changed: ${filename}`);
+          console.log("🔄 Reloading...\n");
+
+          // Re-scan JS files in case new ones were added
+          this.jsFiles = this.findJSFiles(srcDir);
+
+          // Notify all connected clients to reload
+          this.notifyClients("reload");
+        }
+      },
+    );
+
+    this.watchers.push(watcher);
+  }
+
+  private notifyClients(event: string): void {
+    const message = `data: ${event}\n\n`;
+    this.sseClients.forEach((client) => {
+      try {
+        client.write(message);
+      } catch (error) {
+        // Client disconnected, remove it
+        this.sseClients = this.sseClients.filter((c) => c !== client);
+      }
     });
   }
 
@@ -83,7 +152,8 @@ export class DevCommand implements ICommand {
     const combinedSource = sources.join("\n\n");
 
     // Use auto-detected JS files
-    const customFunctionsPath = this.jsFiles.length > 0 ? this.jsFiles[0] : undefined;
+    const customFunctionsPath =
+      this.jsFiles.length > 0 ? this.jsFiles[0] : undefined;
 
     // Use the first file path for reference
     const result = this.compiler.compile(combinedSource, lingoFiles[0], {
@@ -105,10 +175,7 @@ export class DevCommand implements ICommand {
           `from '${relativePath}'`,
           `from './custom-${fileName}'`,
         );
-        code = code.replace(
-          `from '${jsFile}'`,
-          `from './custom-${fileName}'`,
-        );
+        code = code.replace(`from '${jsFile}'`, `from './custom-${fileName}'`);
       });
 
       return code;
@@ -198,13 +265,60 @@ export class DevCommand implements ICommand {
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+    .hot-reload-indicator {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #10b981;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .hot-reload-indicator.show {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
+  <div class="hot-reload-indicator" id="reload-indicator">🔄 Reloading...</div>
   <div id="app"></div>
   <script type="module">
     import { createApp } from './app.js';
+    
+    // Initialize app
     createApp();
+
+    // Setup hot reload with Server-Sent Events
+    const eventSource = new EventSource('/events');
+    const indicator = document.getElementById('reload-indicator');
+
+    eventSource.onmessage = (event) => {
+      if (event.data === 'reload') {
+        // Show reload indicator
+        indicator.classList.add('show');
+        
+        // Reload the page after a brief delay
+        setTimeout(() => {
+          window.location.reload();
+        }, 200);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error('Hot reload connection error:', error);
+      eventSource.close();
+    };
+
+    // Display connection status in console
+    eventSource.addEventListener('open', () => {
+      console.log('🔥 Hot reload connected');
+    });
   </script>
 </body>
 </html>`;
