@@ -5,7 +5,7 @@ import { ICommand } from "./ICommand";
 import { Compiler } from "@lingo-dsl/compiler";
 
 export class DevCommand implements ICommand {
-  private customFunctionsPath?: string;
+  private jsFiles: string[] = [];
 
   constructor(private compiler: Compiler) {}
 
@@ -13,8 +13,14 @@ export class DevCommand implements ICommand {
     const port = 3000;
     const srcDir = path.join(process.cwd(), "src");
 
-    // Parse CLI arguments
-    this.customFunctionsPath = this.parseCustomFunctionsPath(args);
+    // Auto-detect JavaScript files
+    this.jsFiles = this.findJSFiles(srcDir);
+    if (this.jsFiles.length > 0) {
+      console.log(`Found ${this.jsFiles.length} JavaScript file(s)`);
+      this.jsFiles.forEach(file => {
+        console.log(`  - ${path.relative(process.cwd(), file)}`);
+      });
+    }
 
     console.log("Starting LingoUI dev server...");
 
@@ -31,19 +37,22 @@ export class DevCommand implements ICommand {
       } else if (url === "/runtime.js") {
         res.writeHead(200, { "Content-Type": "application/javascript" });
         res.end(this.generateRuntimeStub());
-      } else if (url === "/functions.js" && this.customFunctionsPath) {
-        // Serve custom functions file
-        try {
-          const functionsPath = path.resolve(
-            process.cwd(),
-            this.customFunctionsPath,
-          );
-          const functionsCode = fs.readFileSync(functionsPath, "utf-8");
-          res.writeHead(200, { "Content-Type": "application/javascript" });
-          res.end(functionsCode);
-        } catch (error) {
+      } else if (url.startsWith("/custom-") && url.endsWith(".js")) {
+        // Serve auto-detected custom JS files
+        const fileName = url.replace("/custom-", "");
+        const matchingFile = this.jsFiles.find(f => path.basename(f) === fileName);
+        if (matchingFile) {
+          try {
+            const jsCode = fs.readFileSync(matchingFile, "utf-8");
+            res.writeHead(200, { "Content-Type": "application/javascript" });
+            res.end(jsCode);
+          } catch (error) {
+            res.writeHead(404);
+            res.end("// JS file not found");
+          }
+        } else {
           res.writeHead(404);
-          res.end("// Functions file not found");
+          res.end("// JS file not found");
         }
       } else {
         res.writeHead(404);
@@ -56,14 +65,6 @@ export class DevCommand implements ICommand {
       console.log(`  Serving files from: ${srcDir}`);
       console.log("\n  Press Ctrl+C to stop\n");
     });
-  }
-
-  private parseCustomFunctionsPath(args: string[]): string | undefined {
-    const functionsIndex = args.indexOf("--functions");
-    if (functionsIndex !== -1 && functionsIndex + 1 < args.length) {
-      return args[functionsIndex + 1];
-    }
-    return undefined;
   }
 
   private compileLingoFiles(srcDir: string): string {
@@ -81,9 +82,12 @@ export class DevCommand implements ICommand {
     }
     const combinedSource = sources.join("\n\n");
 
+    // Use auto-detected JS files
+    const customFunctionsPath = this.jsFiles.length > 0 ? this.jsFiles[0] : undefined;
+
     // Use the first file path for reference
     const result = this.compiler.compile(combinedSource, lingoFiles[0], {
-      customFunctionsPath: this.customFunctionsPath,
+      customFunctionsPath,
     });
 
     if (result.success && result.code) {
@@ -93,13 +97,19 @@ export class DevCommand implements ICommand {
         "from './runtime.js'",
       );
 
-      // Replace custom functions import path for dev server
-      if (this.customFunctionsPath) {
+      // Replace custom functions import paths for dev server
+      this.jsFiles.forEach((jsFile) => {
+        const fileName = path.basename(jsFile);
+        const relativePath = path.relative(process.cwd(), jsFile);
         code = code.replace(
-          `from '${this.customFunctionsPath}'`,
-          "from './functions.js'",
+          `from '${relativePath}'`,
+          `from './custom-${fileName}'`,
         );
-      }
+        code = code.replace(
+          `from '${jsFile}'`,
+          `from './custom-${fileName}'`,
+        );
+      });
 
       return code;
     } else {
@@ -125,6 +135,27 @@ export class DevCommand implements ICommand {
       if (entry.isDirectory()) {
         files.push(...this.findLingoFiles(fullPath));
       } else if (entry.name.endsWith(".lingo")) {
+        files.push(fullPath);
+      }
+    }
+
+    return files;
+  }
+
+  private findJSFiles(dir: string): string[] {
+    if (!fs.existsSync(dir)) {
+      return [];
+    }
+
+    const files: string[] = [];
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        files.push(...this.findJSFiles(fullPath));
+      } else if (entry.name.endsWith(".js")) {
         files.push(fullPath);
       }
     }
