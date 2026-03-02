@@ -9,7 +9,7 @@ import { useState } from "react";
 import type { LearningModule, Lesson } from "@/lib/engine";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { BookOpen, CheckCircle, Circle, ChevronRight, Lightbulb, Target } from "lucide-react";
+import { BookOpen, CheckCircle, Circle, ChevronRight, Lightbulb, Target, Copy, Check } from "lucide-react";
 
 interface LearningModuleViewerProps {
   modules: LearningModule[];
@@ -169,6 +169,14 @@ function LessonItem({ lesson, isActive, isCompleted, lessonNumber, onSelect }: L
 }
 
 export function LessonContentViewer({ lesson }: { lesson: Lesson | null }) {
+  const [copiedAnswer, setCopiedAnswer] = useState(false);
+
+  const handleCopyAnswer = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedAnswer(true);
+    setTimeout(() => setCopiedAnswer(false), 2000);
+  };
+
   if (!lesson) {
     return (
       <div className="flex items-center justify-center h-full min-h-[300px] text-zinc-500">
@@ -215,8 +223,8 @@ export function LessonContentViewer({ lesson }: { lesson: Lesson | null }) {
             <h4 className="text-sm font-semibold mb-2">Exercise</h4>
             <p className="text-sm text-zinc-700 dark:text-zinc-300">{lesson.exercises[0].instruction}</p>
             
-            {lesson.exercises[0].hints.length > 0 && (
-              <Accordion type="single" collapsible className="mt-3">
+            <Accordion type="single" collapsible className="mt-3">
+              {lesson.exercises[0].hints.length > 0 && (
                 <AccordionItem value="hints">
                   <AccordionTrigger className="text-sm">Show Hints</AccordionTrigger>
                   <AccordionContent>
@@ -227,8 +235,41 @@ export function LessonContentViewer({ lesson }: { lesson: Lesson | null }) {
                     </ul>
                   </AccordionContent>
                 </AccordionItem>
-              </Accordion>
-            )}
+              )}
+              
+              {lesson.exercises[0].solution && (
+                <AccordionItem value="answer">
+                  <AccordionTrigger className="text-sm">Show Answer</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="relative">
+                      <pre className="p-3 rounded bg-white dark:bg-zinc-900 border border-violet-200 dark:border-violet-800 text-xs overflow-x-auto">
+                        <code>{lesson.exercises[0].solution}</code>
+                      </pre>
+                      <button
+                        onClick={() => handleCopyAnswer(lesson.exercises[0].solution)}
+                        className={`absolute top-2 right-2 px-2 py-1 text-xs rounded transition-all flex items-center gap-1 ${
+                          copiedAnswer
+                            ? "bg-green-600 hover:bg-green-700"
+                            : "bg-violet-600 hover:bg-violet-700"
+                        } text-white`}
+                      >
+                        {copiedAnswer ? (
+                          <>
+                            <Check className="w-3 h-3" />
+                            Copied!
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            Copy
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+            </Accordion>
           </div>
         )}
       </CardContent>

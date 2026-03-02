@@ -14,7 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Sparkles, Home, Network, Code2, BookOpen, Zap, Menu } from "lucide-react";
 import { createEngine, ExecutionPhase } from "@/lib/engine";
 import { ExecutionController } from "@/lib/engine/controllers/ExecutionController";
-import type { ExecutionState, TreeNodeData, DiffViewData, ReactEquivalent, EngineInternals } from "@/lib/engine";
+import type { ExecutionState, TreeNodeData, DiffViewData, ReactEquivalent } from "@/lib/engine";
 import { RenderTreeVisualizer } from "@/components/visualizer/RenderTreeVisualizer";
 import { StateDiffViewer } from "@/components/visualizer/StateDiffViewer";
 import { ExecutionStepper } from "@/components/visualizer/ExecutionStepper";
@@ -22,18 +22,28 @@ import { SideBySideComparison } from "@/components/visualizer/SideBySideComparis
 import { UnderTheHoodInspector } from "@/components/visualizer/UnderTheHoodInspector";
 import { LearningModuleViewer, LessonContentViewer } from "@/components/learn/LearningModuleViewer";
 import LingoEditor from "@/components/LingoEditor";
+import LivePreview from "@/components/LivePreview";
 import { LEARNING_MODULES } from "@/constants/learningModules";
 import type { LearningModule, Lesson } from "@/lib/engine";
+import { 
+  Compiler,
+  LingoTokenizer,
+  LingoParser,
+  LingoAnalyzer,
+  JSCodeGenerator,
+  ConsoleErrorReporter
+} from "@lingo-dsl/compiler";
 
 export default function ExplorerPage() {
   const [code, setCode] = useState("");
   const [functions, setFunctions] = useState("");
+  const [compiledCode, setCompiledCode] = useState("");
+  const [compilationError, setCompilationError] = useState<string | null>(null);
   const [engine] = useState(() => createEngine());
   const [executionState, setExecutionState] = useState<ExecutionState | null>(null);
   const [treeData, setTreeData] = useState<TreeNodeData | null>(null);
   const [diffs] = useState<DiffViewData[]>([]);
   const [reactEquivalent, setReactEquivalent] = useState<ReactEquivalent | null>(null);
-  const [internals, setInternals] = useState<EngineInternals | null>(null);
   const [showInternals, setShowInternals] = useState(false);
   const [currentModule, setCurrentModule] = useState<LearningModule | null>(LEARNING_MODULES[0]);
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
@@ -54,9 +64,6 @@ export default function ExplorerPage() {
       const reactCode = engine.reactGenerator.generate(state.ast);
       setReactEquivalent(reactCode);
     }
-
-    const engineInternals = engine.inspector.getInternals();
-    setInternals(engineInternals);
   }, [engine]);
 
   const handleStep = useCallback(async () => {
@@ -109,12 +116,59 @@ export default function ExplorerPage() {
     }
   }, [engine, updateVisualizationData]);
 
+  const compileCode = useCallback((lingoCode: string, customFunctions: string) => {
+    try {
+      const errorReporter = new ConsoleErrorReporter();
+      const tokenizer = new LingoTokenizer(errorReporter);
+      const parser = new LingoParser(errorReporter);
+      const analyzer = new LingoAnalyzer(errorReporter);
+      const codeGenerator = new JSCodeGenerator();
+      
+      const compiler = new Compiler(
+        tokenizer,
+        parser,
+        analyzer,
+        codeGenerator,
+        errorReporter
+      );
+      
+      const result = compiler.compile(lingoCode);
+      
+      if (!result.success || !result.code) {
+        throw new Error(result.errors.map(e => e.message).join('\n') || 'Compilation failed');
+      }
+      
+      const replaceCodeWithImports = result.code.replace("import { createSignal, createEffect, renderApp } from '@lingo-dsl/runtime';", "import { createSignal, createEffect, renderApp } from 'https://cdn.jsdelivr.net/npm/@lingo-dsl/runtime@0.1.0/+esm';");
+      
+      const codeWithImports = `
+${customFunctions}
+
+${replaceCodeWithImports}
+`;
+      
+      setCompiledCode(codeWithImports);
+      setCompilationError(null);
+    } catch (err) {
+      setCompilationError(err instanceof Error ? err.message : String(err));
+      setCompiledCode("");
+    }
+  }, []);
+
   const handleCodeChange = useCallback(async (newCode: string) => {
     setCode(newCode);
+    // Compile for live preview
+    compileCode(newCode, functions);
     // Reset execution when code changes (no auto-execution)
     (engine.execution as ExecutionController).setSourceCode(newCode);
     updateVisualizationData();
-  }, [engine, updateVisualizationData]);
+  }, [engine, updateVisualizationData, compileCode, functions]);
+
+  // Compile when functions change
+  useEffect(() => {
+    if (code) {
+      compileCode(code, functions);
+    }
+  }, [functions, code, compileCode]);
 
   // Initialize with first lesson
   useEffect(() => {
@@ -230,7 +284,7 @@ export default function ExplorerPage() {
               </TabsContent>
 
               {/* Visualize Mode */}
-              <TabsContent value="visualize" className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 m-0">
+              <TabsContent value="visualize" className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 m-0">
                 <div className="space-y-4 overflow-auto">
                   <ExecutionStepper
                     executionState={executionState || {
@@ -265,6 +319,21 @@ export default function ExplorerPage() {
                   highlightedNodeIds={highlightedNodes}
                   onNodeClick={(nodeId) => console.log("Node clicked:", nodeId)}
                 />
+
+                <Card className="h-full flex flex-col overflow-hidden">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      Live Preview
+                    </CardTitle>
+                  </CardHeader>
+                  <div className="flex-1 overflow-hidden">
+                    <LivePreview 
+                      compiledCode={compiledCode} 
+                      error={compilationError}
+                    />
+                  </div>
+                </Card>
               </TabsContent>
 
               {/* Compare Mode */}
@@ -292,7 +361,7 @@ export default function ExplorerPage() {
                 </div>
                 
                 <UnderTheHoodInspector
-                  internals={internals}
+                  executionState={executionState}
                   isVisible={showInternals}
                   onToggle={() => setShowInternals(!showInternals)}
                 />
