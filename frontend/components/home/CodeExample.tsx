@@ -78,7 +78,7 @@ function CodeBlock({ code }: CodeBlockProps) {
 function CodeExampleFooter() {
   return (
     <p className="text-center mt-8 text-lg text-zinc-600 dark:text-zinc-400">
-      That&apos;s it! No framework setup, no build tools—just plain Lingo. 🎉
+      That&apos;s it! No framework setup, no build tools—just plain Lingo.
     </p>
   );
 }

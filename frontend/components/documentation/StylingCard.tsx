@@ -4,7 +4,7 @@ export function StylingCard() {
   return (
     <Card className="p-5 bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20">
       <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
-        🎨 Styling & Layout
+        Styling & Layout
       </h3>
       <div className="space-y-3 text-sm">
         <StylePropertiesHeader />
@@ -30,7 +30,7 @@ function StylePropertiesHeader() {
 function StylePropertyExamples() {
   const properties = [
     {
-      title: "🎨 Text Color",
+      title: "Text Color",
       syntax: "colored [color]",
       examples: [
         'Show a text saying "Green text" colored green.',
@@ -38,7 +38,7 @@ function StylePropertyExamples() {
       ],
     },
     {
-      title: "🖼️ Background Color",
+      title: "Background Color",
       syntax: "background [color]",
       examples: [
         'Show a text saying "Highlighted" background yellow.',
@@ -46,7 +46,7 @@ function StylePropertyExamples() {
       ],
     },
     {
-      title: "📐 Text Alignment",
+      title: "Text Alignment",
       syntax: "centered | aligned left | aligned right | aligned center",
       examples: [
         'Show a heading saying "Title" centered.',
@@ -54,7 +54,7 @@ function StylePropertyExamples() {
       ],
     },
     {
-      title: "📦 Layout Containers",
+      title: "Layout Containers",
       syntax: 'row containing, | column gap "[size]" containing,',
       examples: [
         "Show a row containing,",
@@ -67,7 +67,7 @@ function StylePropertyExamples() {
       ],
     },
     {
-      title: "🌈 Combining Styles",
+      title: "Combining Styles",
       syntax: 'Use "and" to combine multiple styles:',
       examples: [
         'Show a heading saying "Welcome" colored blue and centered.',

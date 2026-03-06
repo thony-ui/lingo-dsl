@@ -4,7 +4,7 @@ export function ActionsCard() {
   return (
     <Card className="p-5 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20">
       <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
-        ⚡ Actions Reference
+        Actions Reference
       </h3>
       <div className="space-y-3 text-sm">
         <ActionCategories />

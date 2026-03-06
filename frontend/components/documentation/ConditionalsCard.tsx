@@ -4,7 +4,7 @@ export function ConditionalsCard() {
   return (
     <Card className="p-5 bg-gradient-to-br from-rose-50 to-red-50 dark:from-rose-950/20 dark:to-red-950/20">
       <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
-        🔀 Conditionals
+        Conditionals
       </h3>
       <div className="space-y-3 text-sm">
         <ConditionalSyntax />

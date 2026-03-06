@@ -4,7 +4,7 @@ export function LoopsCard() {
   return (
     <Card className="p-5 bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-950/20 dark:to-cyan-950/20">
       <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
-        🔁 Loops
+        Loops
       </h3>
       <div className="space-y-3 text-sm">
         <ForEachLoop />

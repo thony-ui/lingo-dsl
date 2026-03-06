@@ -14,7 +14,7 @@ export function TypeSystemCard() {
 function CardHeader() {
   return (
     <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-zinc-50">
-      📝 Type System
+      Type System
     </h3>
   );
 }
@@ -37,25 +37,21 @@ function StateDeclarationSyntax() {
 function TypeExamples() {
   const types = [
     {
-      icon: "🔢",
       name: "Number",
       example: 'There is a number called count starting at 0.',
       description: "For numeric values (integers and decimals)",
     },
     {
-      icon: "📄",
       name: "Text",
       example: 'There is a text called name starting at "Alice".',
       description: "For string values (must use quotes)",
     },
     {
-      icon: "✅",
       name: "Boolean",
       example: "There is a boolean called isActive starting at true.",
       description: "For true/false values",
     },
     {
-      icon: "📋",
       name: "List",
       example: "There is a list called items starting empty.",
       description: "For arrays of items",
@@ -72,17 +68,16 @@ function TypeExamples() {
 }
 
 interface TypeCardProps {
-  icon: string;
   name: string;
   example: string;
   description: string;
 }
 
-function TypeCard({ icon, name, example, description }: TypeCardProps) {
+function TypeCard({ name, example, description }: TypeCardProps) {
   return (
     <div className="bg-white dark:bg-zinc-900 p-3 rounded-lg border">
       <div className="font-semibold text-zinc-800 dark:text-zinc-200 mb-2 text-xs">
-        {icon} {name}
+        {name}
       </div>
       <code className="text-xs text-zinc-600 dark:text-zinc-400 block">
         {example}
